@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Register Contestant | VBC Votes</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#eef3ff;
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+h1{
+text-align:center;
+color:#003399;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:5px;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#0066ff;
+color:white;
+border:none;
+border-radius:5px;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#004bcc;
+}
+
+a{
+display:block;
+margin-top:20px;
+text-align:center;
+text-decoration:none;
+color:#003399;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Register Contestant</h1>
+
+<form id="contestantForm">
+
+<input
+type="text"
+id="name"
+placeholder="Contestant Name"
+required>
+
+<input
+type="text"
+id="phone"
+placeholder="Phone Number"
+required>
+
+<input
+type="email"
+id="email"
+placeholder="Email Address"
+required>
+
+<input
+type="text"
+id="contest"
+placeholder="Contest Name"
+required>
+
+<input
+type="file"
+id="photo"
+accept="image/*"
+required>
+
+<button type="submit">
+Register Contestant
+</button>
+
+</form>
+
+<a href="dashboard.html">
+← Back to Dashboard
+</a>
+
+</div>
+
+<script></script>
+     const form = document.getElementById("contestantForm");
+     
+     form.addEventListener("submit", function(e){
+     
+     e.preventDefault();
+     
+     const name = document.getElementById("name").value.trim();
+     const phone = document.getElementById("phone").value.trim();
+     const email = document.getElementById("email").value.trim();
+     const contest = document.getElementById("contest").value.trim();
+     const photo = document.getElementById("photo").files[0];
+     
+     let contestants =
+     JSON.parse(localStorage.getItem("contestants")) || [];
+     
+     if(photo){
+     
+     const reader = new FileReader();
+     
+     reader.onload = function(){
+     
+     contestants.push({
+     
+     name:name,
+     phone:phone,
+     email:email,
+     contest:contest,
+     photo:reader.result
+     
+     });
+     
+     localStorage.setItem(
+     "contestants",
+     JSON.stringify(contestants)
+     );
+     
+     alert("Contestant Registered Successfully!");
+     
+     form.reset();
+     
+     };
+     
+     reader.readAsDataURL(photo);
+     
+     }else{
+     
+     alert("Please select a contestant photo.");
+     
+     }
+     
+     });                           alert("Please fill in all the required fields.");
+    </script>
+    
+    </body>
+    </html>                                  return;
+                                            }
+
+                            
+                                                
+                            
+                                                
+                                
+                                        
+                                                
+                                                                    
+                                                            
+                                                                    
+                                                                            
+                                                                                                
+                                                                                                
+                                                                                
+                                                                                                    
+                                                                                    
+                                                                                                    
+                                                                                                        
+                                                                                        
+                                                                                                
+                                                                                            
+                                                                                            
+                                                                                                        
+                                                                                                                    
+                                                                                                                            
+                                                                                                                            
+                                                                                                                                        
+                                                                                                                                            
+                                                                                                                                                            
+                                                                                                                                    
+                                                                                                                                                                
+                                                                                                                                                        
+                                                                                                                                                                
+                                                    
+                                                    
+                                                        
+                                                                
+                                                                
+                                                                
+                                                        
+                                                                
+                                                        
+                                                
+                                                
+            
+            
+            

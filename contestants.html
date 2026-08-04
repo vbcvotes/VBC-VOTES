@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VBC Votes - Contestants</title>
+    </head>
+    <body>
+
+    <h1>Registered Contestants</h1>
+
+    <div id="contestantList"></div>
+
+    <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+<script>
+    let contestants = JSON.parse(localStorage.getItem("contestants")) || [];
+
+    let list = document.getElementById("contestantList");
+
+    if (contestants.length === 0) {
+        list.innerHTML = "<p>No contestants have been registered yet.</p>";
+        } else {
+            contestants.forEach(function(contestant) {
+                    list.innerHTML += `
+                                <div>
+                                                <h3>${contestant.fullName}</h3>
+                                                  ${contestant.photo ? `<img src="${contestant.photo}" width="150">` : ""}              
+                                                <p>Contest: ${contestant.contestName}</p>
+                                                                          
+                                            <p>Phone: ${contestant.phone}</p>
+                                                                                                <p>Email: ${contestant.email}</p>
+                                                                                                                <hr>
+                                                                                                                            </div>
+                                                                                                                                    `;
+                                                                                                                                        });
+                                                                                                                                        }
+                                                                                                                                        </script>
+    </body>
+    </html>
