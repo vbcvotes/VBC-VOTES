@@ -21,9 +21,13 @@
             contestants.forEach(function(contestant) {
                     list.innerHTML += `
                                 <div>
-                                                <h3>${fullName}</h3>
-                                                  ${photo ? `<img src="${photo}" width="150">` : ""}              
-                                                <p>Contest: ${contestName}</p>
+                                                ${contestant.photo ? `<img src="${contestant.photo}" width="150">` : ""}
+                                                <p>Contest: ${contestant.contest}</p>
+                                                <h3>${contestant.name}</h3>
+                                                <p>Email: ${contestant.email}</p>
+                                                <p>Phone: ${contestant.phone}</p>
+                                                       
+                                    
                                                                           
                                             <p>Phone: ${phone}</p>
                                                                                                 <p>Email: ${email}</p>
