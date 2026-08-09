@@ -1,41 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>VBC Votes - Contestants</title>
-    </head>
-    <body>
 
-    <h1>Registered Contestants</h1>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <div id="contestantList"></div>
+<title>VBC Votes - Contestants</title>
 
-    <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#eef3ff;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:600px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    color:#003399;
+}
+
+.contestant{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+}
+
+.contestant img{
+    display:block;
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    margin:0 auto 15px;
+    border-radius:8px;
+}
+
+.contestant h3{
+    color:#003399;
+}
+
+.back{
+    display:block;
+    width:100%;
+    padding:12px;
+    background:#0066ff;
+    color:white;
+    border:none;
+    border-radius:5px;
+    font-size:16px;
+    text-align:center;
+    text-decoration:none;
+    box-sizing:border-box;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Registered Contestants</h1>
+
+<div id="contestantList"></div>
+
+<a class="back" href="dashboard.html">
+    ← Back to Dashboard
+</a>
+
+</div>
+
 <script>
-    let contestants = JSON.parse(localStorage.getItem("contestants")) || [];
 
-    let list = document.getElementById("contestantList");
+let contestants =
+    JSON.parse(localStorage.getItem("contestants")) || [];
 
-    if (contestants.length === 0) {
-        list.innerHTML = "<p>No contestants have been registered yet.</p>";
-        } else {
-            contestants.forEach(function(contestant) {
-                    list.innerHTML += `
-                                <div>
-                                                ${contestant.photo ? `<img src="${contestant.photo}" width="150">` : ""}
-                                                <p>Contest: ${contestant.contest}</p>
-                                                <h3>${contestant.name}</h3>
-                                                <p>Email: ${contestant.email}</p>
-                                                <p>Phone: ${contestant.phone}</p>
-                                                       
-                                    
-                                                                          
-                                            <p>Phone: ${phone}</p>
-                                                                                                <p>Email: ${email}</p>
-                                                                                                                <hr>
-                                                                                                                            </div>
-                                                                                                                                    `;
-                                                                                                                                        });
-                                                                                                                                        }
-                                                                                                                                        </script>
-    </body>
-    </html>
+let list =
+    document.getElementById("contestantList");
+
+if (contestants.length === 0) {
+
+    list.innerHTML =
+        "<p>No contestants have been registered yet.</p>";
+
+} else {
+
+    contestants.forEach(function(contestant) {
+
+        list.innerHTML += `
+
+            <div class="contestant">
+
+                ${
+                    contestant.photo
+                    ? `<img src="${contestant.photo}" alt="Contestant Photo">`
+                    : ""
+                }
+
+                <h3>${contestant.name}</h3>
+
+                <p>
+                    <strong>Contest:</strong>
+                    ${contestant.contest}
+                </p>
+
+                <p>
+                    <strong>Email:</strong>
+                    ${contestant.email}
+                </p>
+
+                <p>
+                    <strong>Phone:</strong>
+                    ${contestant.phone}
+                </p>
+
+                <hr>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
+                                                                                      
+                                                                                                          
+                                                                                                                 
+                                                                                                                                    
+                                                                                                                                     
+                                                                                                                            
+                                                                        
