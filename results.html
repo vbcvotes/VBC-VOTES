@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VBC Votes - Results</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#eef3ff;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    color:#003399;
+}
+
+#contestSelect{
+    width:100%;
+    padding:12px;
+    margin-bottom:20px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box;
+}
+
+.result{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+}
+
+.result img{
+    display:block;
+    width:120px;
+    height:120px;
+    object-fit:cover;
+    border-radius:8px;
+    margin:auto;
+}
+
+.result h2{
+    text-align:center;
+    color:#003399;
+}
+
+.votes{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.rank{
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.back{
+    display:block;
+    text-align:center;
+    margin-top:20px;
+    color:#003399;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>VBC Votes Results</h1>
+
+<select id="contestSelect">
+
+<option value="">
+Select Contest
+</option>
+
+</select>
+
+<div id="resultsList"></div>
+
+<a class="back" href="dashboard.html">
+← Back to Dashboard
+</a>
+
+</div>
+
+
+<script>
+
+const contestSelect =
+document.getElementById("contestSelect");
+
+const resultsList =
+document.getElementById("resultsList");
+
+
+let contests =
+JSON.parse(localStorage.getItem("contests")) || [];
+
+
+let contestants =
+JSON.parse(localStorage.getItem("contestants")) || [];
+
+
+/* Load contests */
+
+contests.forEach(function(contest){
+
+const option =
+document.createElement("option");
+
+option.value =
+contest.name;
+
+option.textContent =
+contest.name;
+
+contestSelect.appendChild(option);
+
+});
+
+
+/* Display results */
+
+function showResults(){
+
+const selectedContest =
+contestSelect.value;
+
+resultsList.innerHTML = "";
+
+
+if(!selectedContest){
+
+resultsList.innerHTML =
+"<p>Please select a contest.</p>";
+
+return;
+
+}
+
+
+let filtered =
+contestants.filter(function(contestant){
+
+return contestant.contest === selectedContest;
+
+});
+
+
+if(filtered.length === 0){
+
+resultsList.innerHTML =
+"<p>No contestants found for this contest.</p>";
+
+return;
+
+}
+
+
+/* Sort highest votes first */
+
+filtered.sort(function(a,b){
+
+return Number(b.votes || 0) -
+       Number(a.votes || 0);
+
+});
+
+
+filtered.forEach(function(contestant,index){
+
+const div =
+document.createElement("div");
+
+div.className =
+"result";
+
+
+div.innerHTML = `
+
+<div class="rank">
+Rank ${index + 1}
+</div>
+
+${
+contestant.photo
+? `<img src="${contestant.photo}" alt="Contestant Photo">`
+: ""
+}
+
+<h2>
+${contestant.name}
+</h2>
+
+<div class="votes">
+Votes: ${Number(contestant.votes || 0)}
+</div>
+
+`;
+
+resultsList.appendChild(div);
+
+});
+
+}
+
+
+contestSelect.addEventListener(
+"change",
+showResults
+);
+
+</script>
+
+</body>
+</html>
