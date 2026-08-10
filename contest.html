@@ -109,33 +109,111 @@ Create Contest
 
 <script>
 
-const form = document.getElementById("contestForm");
+const SUPABASE_URL =
+    "https://dwedhbcsgfdqvurgnuvf.supabase.co";
 
-form.addEventListener("submit", function(e){
+const SUPABASE_KEY =
+    "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
+
+
+const form =
+    document.getElementById("contestForm");
+
+
+form.addEventListener("submit", async function(e){
 
     e.preventDefault();
 
+
     const contest = {
-        name: document.getElementById("contestName").value.trim(),
-        organizer: document.getElementById("organizer").value.trim(),
-        startDate: document.getElementById("startDate").value,
-        endDate: document.getElementById("endDate").value,
-        description: document.getElementById("description").value.trim()
+
+        name:
+            document.getElementById("contestName")
+            .value.trim(),
+
+        organizer:
+            document.getElementById("organizer")
+            .value.trim(),
+
+        start_date:
+            document.getElementById("startDate")
+            .value,
+
+        end_date:
+            document.getElementById("endDate")
+            .value,
+
+        description:
+            document.getElementById("description")
+            .value.trim()
+
     };
 
-    let contests =
-        JSON.parse(localStorage.getItem("contests")) || [];
 
-    contests.push(contest);
+    try {
 
-    localStorage.setItem(
-        "contests",
-        JSON.stringify(contests)
-    );
+        const response =
+            await fetch(
+                SUPABASE_URL + "/rest/v1/contests",
+                {
 
-    alert("Contest Created Successfully!");
+                    method: "POST",
 
-    form.reset();
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " + SUPABASE_KEY,
+
+                        "Prefer":
+                            "return=minimal"
+
+                    },
+
+                    body:
+                        JSON.stringify(contest)
+
+                }
+            );
+
+
+        if(!response.ok){
+
+            const error =
+                await response.text();
+
+            console.error(error);
+
+            alert(
+                "Contest could not be created."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "Contest Created Successfully!"
+        );
+
+
+        form.reset();
+
+
+    } catch(error){
+
+        console.error(error);
+
+        alert(
+            "Connection error. Please try again."
+        );
+
+    }
 
 });
 
