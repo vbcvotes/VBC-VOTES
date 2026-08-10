@@ -184,16 +184,15 @@ form.addEventListener("submit", async function(e){
 
         if(!response.ok){
 
-            const error =
-                await response.text();
+    const error =
+        await response.text();
 
-            console.error(error);
+    alert("Supabase Error: " + error);
 
-            alert(
-                "Contest could not be created."
-            );
+    console.error(error);
 
-            return;
+    return;
+}
         }
 
 
