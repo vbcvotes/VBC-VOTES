@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create Contest | VBC Votes</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#eef3ff;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+}
+
+h1{
+    text-align:center;
+    color:#003399;
+}
+
+input, textarea{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:13px;
+    background:#18a84b;
+    color:white;
+    border:none;
+    border-radius:6px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+a{
+    display:block;
+    margin-top:20px;
+    text-align:center;
+    color:#003399;
+    font-weight:bold;
+    text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Create New Contest</h1>
+
+<form id="contestForm">
+
+<input
+type="text"
+id="contestName"
+placeholder="Contest Name"
+required>
+
+<input
+type="text"
+id="organizer"
+placeholder="Organizer Name"
+required>
+
+<input
+type="date"
+id="startDate"
+required>
+
+<input
+type="date"
+id="endDate"
+required>
+
+<textarea
+id="description"
+placeholder="Contest Description"
+rows="5"
+required></textarea>
+
+<button type="submit">
+Create Contest
+</button>
+
+</form>
+
+<a href="dashboard.html">
+← Back to Dashboard
+</a>
+
+</div>
+
+<script>
+
+const form = document.getElementById("contestForm");
+
+form.addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    const contest = {
+        name: document.getElementById("contestName").value.trim(),
+        organizer: document.getElementById("organizer").value.trim(),
+        startDate: document.getElementById("startDate").value,
+        endDate: document.getElementById("endDate").value,
+        description: document.getElementById("description").value.trim()
+    };
+
+    let contests =
+        JSON.parse(localStorage.getItem("contests")) || [];
+
+    contests.push(contest);
+
+    localStorage.setItem(
+        "contests",
+        JSON.stringify(contests)
+    );
+
+    alert("Contest Created Successfully!");
+
+    form.reset();
+
+});
+
+</script>
+
+</body>
+</html>
