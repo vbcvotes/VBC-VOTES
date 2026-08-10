@@ -71,12 +71,10 @@ a {
 
 <form id="contestantForm">
 
-<input
-    type="text"
-    id="name"
-    placeholder="Contestant Name"
-    required
->
+<select id="contest" required>
+    <option value="">Select Contest</option>
+</select>
+   
 
 <input
     type="text"
@@ -119,7 +117,21 @@ Register Contestant
 </div>
 
 <script>
+const contestSelect = document.getElementById("contest");
 
+const contests =
+    JSON.parse(localStorage.getItem("contests")) || [];
+
+contests.forEach(function(contest) {
+
+    const option = document.createElement("option");
+
+    option.value = contest.name;
+    option.textContent = contest.name;
+
+    contestSelect.appendChild(option);
+
+});
 const form = document.getElementById("contestantForm");
 
 form.addEventListener("submit", function(event) {
