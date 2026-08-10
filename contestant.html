@@ -68,13 +68,14 @@ a {
 <div class="container">
 
 <h1>Register Contestant</h1>
-
 <form id="contestantForm">
 
-<select id="contest" required>
-    <option value="">Select Contest</option>
-</select>
-   
+<input
+    type="text"
+    id="name"
+    placeholder="Contestant Name"
+    required
+>
 
 <input
     type="text"
@@ -88,6 +89,8 @@ a {
     id="email"
     placeholder="Email Address"
     required
+>
+
 <select id="contest" required>
     <option value="">Select Contest</option>
 </select>
@@ -104,7 +107,6 @@ Register Contestant
 </button>
 
 </form>
-
 <a href="dashboard.html">
 ← Back to Dashboard
 </a>
