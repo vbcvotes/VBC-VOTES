@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vote | VBC Votes</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#eef3ff;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    color:#003399;
+}
+
+#contestSelect{
+    width:100%;
+    padding:12px;
+    margin-bottom:20px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box;
+}
+
+.contestant{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+    text-align:center;
+}
+
+.contestant img{
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+.contestant h2{
+    color:#003399;
+}
+
+.voteButton{
+    width:100%;
+    padding:13px;
+    background:#18a84b;
+    color:white;
+    border:none;
+    border-radius:6px;
+    font-size:17px;
+    cursor:pointer;
+}
+
+.voteButton:hover{
+    background:#12843a;
+}
+
+.back{
+    display:block;
+    text-align:center;
+    margin-top:20px;
+    color:#003399;
+    font-weight:bold;
+    text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>VBC Votes</h1>
+
+<select id="contestSelect">
+    <option value="">Select Contest</option>
+</select>
+
+<div id="contestantsList"></div>
+
+<a class="back" href="index.html">
+← Back
+</a>
+
+</div>
+
+<script>
+
+const contestSelect =
+    document.getElementById("contestSelect");
+
+const contestantsList =
+    document.getElementById("contestantsList");
+
+let contests =
+    JSON.parse(localStorage.getItem("contests")) || [];
+
+let contestants =
+    JSON.parse(localStorage.getItem("contestants")) || [];
+
+
+/* Load contests */
+
+contests.forEach(function(contest){
+
+    const option =
+        document.createElement("option");
+
+    option.value = contest.name;
+
+    option.textContent = contest.name;
+
+    contestSelect.appendChild(option);
+
+});
+
+
+/* Display contestants */
+
+function showContestants(){
+
+    const selectedContest =
+        contestSelect.value;
+
+    contestantsList.innerHTML = "";
+
+    if(!selectedContest){
+
+        contestantsList.innerHTML =
+            "<p>Please select a contest.</p>";
+
+        return;
+    }
+
+
+    const filtered =
+        contestants.filter(function(contestant){
+
+            return contestant.contest === selectedContest;
+
+        });
+
+
+    if(filtered.length === 0){
+
+        contestantsList.innerHTML =
+            "<p>No contestants registered for this contest.</p>";
+
+        return;
+    }
+
+
+    filtered.forEach(function(contestant){
+
+        if(typeof contestant.votes !== "number"){
+
+            contestant.votes = 0;
+
+        }
+
+
+        const div =
+            document.createElement("div");
+
+        div.className = "contestant";
+
+
+        div.innerHTML = `
+
+            ${
+                contestant.photo
+                ? `<img src="${contestant.photo}" alt="Contestant Photo">`
+                : ""
+            }
+
+            <h2>${contestant.name}</h2>
+
+            <p>
+                Votes:
+                <strong>${contestant.votes}</strong>
+            </p>
+
+            <button class="voteButton">
+                Vote
+            </button>
+
+        `;
+
+
+        const voteButton =
+            div.querySelector(".voteButton");
+
+
+        voteButton.addEventListener(
+            "click",
+            function(){
+
+                contestant.votes =
+                    Number(contestant.votes || 0) + 1;
+
+
+                localStorage.setItem(
+                    "contestants",
+                    JSON.stringify(contestants)
+                );
+
+
+                showContestants();
+
+            }
+        );
+
+
+        contestantsList.appendChild(div);
+
+    });
+
+}
+
+
+contestSelect.addEventListener(
+    "change",
+    showContestants
+);
+
+</script>
+
+</body>
+</html>
