@@ -7,6 +7,7 @@
 <title>Vote | VBC Votes</title>
 
 <style>
+
 body{
     font-family:Arial,sans-serif;
     background:#eef3ff;
@@ -76,8 +77,91 @@ h1{
     font-weight:bold;
     text-decoration:none;
 }
+
+
+/* =========================
+   VOTING FORM
+========================= */
+
+#votingPanel{
+    display:none;
+    background:white;
+    padding:25px;
+    margin-top:20px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+}
+
+#votingPanel h2{
+    text-align:center;
+    color:#003399;
+}
+
+.selectedContestant{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.selectedContestant img{
+    width:120px;
+    height:120px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:6px;
+    font-weight:bold;
+}
+
+input, select{
+    width:100%;
+    padding:12px;
+    box-sizing:border-box;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+#totalAmount{
+    margin-top:20px;
+    padding:15px;
+    background:#eef3ff;
+    border-radius:6px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    color:#003399;
+}
+
+.payButton{
+    width:100%;
+    padding:14px;
+    margin-top:15px;
+    background:#0066ff;
+    color:white;
+    border:none;
+    border-radius:6px;
+    font-size:17px;
+    cursor:pointer;
+}
+
+.cancelButton{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    background:#777;
+    color:white;
+    border:none;
+    border-radius:6px;
+    font-size:16px;
+    cursor:pointer;
+}
+
 </style>
 </head>
+
 
 <body>
 
@@ -85,19 +169,134 @@ h1{
 
 <h1>VBC Votes</h1>
 
+
 <select id="contestSelect">
-    <option value="">Select Contest</option>
+
+    <option value="">
+        Select Contest
+    </option>
+
 </select>
+
 
 <div id="contestantsList"></div>
 
-<a class="back" href="index.html">
-← Back
+
+<!-- =========================
+     VOTING PANEL
+========================= -->
+
+<div id="votingPanel">
+
+    <h2>Cast Your Vote</h2>
+
+
+    <div
+        id="selectedContestant"
+        class="selectedContestant">
+    </div>
+
+
+    <label for="voterContact">
+        Phone Number / Email
+    </label>
+
+    <input
+        type="text"
+        id="voterContact"
+        placeholder="Enter phone number or email"
+    >
+
+
+    <label for="voteAmount">
+        Choose Number of Votes
+    </label>
+
+    <select id="voteAmount">
+
+        <option value="">
+            Select Number of Votes
+        </option>
+
+        <option value="1">
+            1 Vote — ₦100
+        </option>
+
+        <option value="2">
+            2 Votes — ₦200
+        </option>
+
+        <option value="3">
+            3 Votes — ₦300
+        </option>
+
+        <option value="10">
+            10 Votes — ₦1,000
+        </option>
+
+        <option value="50">
+            50 Votes — ₦5,000
+        </option>
+
+        <option value="100">
+            100 Votes — ₦10,000
+        </option>
+
+        <option value="500">
+            500 Votes — ₦50,000
+        </option>
+
+        <option value="1000">
+            1,000 Votes — ₦100,000
+        </option>
+
+    </select>
+
+
+    <div id="totalAmount">
+
+        Total: ₦0
+
+    </div>
+
+
+    <button
+        class="payButton"
+        id="payButton">
+
+        Proceed to Payment
+
+    </button>
+
+
+    <button
+        class="cancelButton"
+        id="cancelButton">
+
+        Cancel
+
+    </button>
+
+</div>
+
+
+<a
+    class="back"
+    href="index.html">
+
+    ← Back
+
 </a>
 
 </div>
 
+
 <script>
+
+
+/* =========================
+   SUPABASE
+========================= */
 
 const SUPABASE_URL =
     "https://dwedhbcsgfdqvurgnuvf.supabase.co";
@@ -106,37 +305,85 @@ const SUPABASE_KEY =
     "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
 
 
+/* =========================
+   ELEMENTS
+========================= */
+
 const contestSelect =
-    document.getElementById("contestSelect");
+    document.getElementById(
+        "contestSelect"
+    );
 
 const contestantsList =
-    document.getElementById("contestantsList");
+    document.getElementById(
+        "contestantsList"
+    );
+
+const votingPanel =
+    document.getElementById(
+        "votingPanel"
+    );
+
+const selectedContestant =
+    document.getElementById(
+        "selectedContestant"
+    );
+
+const voterContact =
+    document.getElementById(
+        "voterContact"
+    );
+
+const voteAmount =
+    document.getElementById(
+        "voteAmount"
+    );
+
+const totalAmount =
+    document.getElementById(
+        "totalAmount"
+    );
+
+const payButton =
+    document.getElementById(
+        "payButton"
+    );
+
+const cancelButton =
+    document.getElementById(
+        "cancelButton"
+    );
+
+
+let currentContestant = null;
 
 
 /* =========================
    LOAD CONTESTS
 ========================= */
 
-async function loadContests() {
+async function loadContests(){
 
-    try {
+    try{
 
-        const response = await fetch(
-            SUPABASE_URL +
-            "/rest/v1/contests?select=id,name&order=created_at.desc",
-            {
-                method: "GET",
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/contests?select=id,name&order=id.asc",
+                {
+                    headers:{
+                        "apikey":
+                            SUPABASE_KEY,
 
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization":
-                        "Bearer " + SUPABASE_KEY
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
                 }
-            }
-        );
+            );
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             const error =
                 await response.text();
@@ -154,30 +401,34 @@ async function loadContests() {
             await response.json();
 
 
-        contestSelect.innerHTML =
-            '<option value="">Select Contest</option>';
+        contests.forEach(
+            function(contest){
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    contest.name;
+
+                option.textContent =
+                    contest.name;
+
+                contestSelect.appendChild(
+                    option
+                );
+
+            }
+        );
 
 
-        contests.forEach(function(contest) {
-
-            const option =
-                document.createElement("option");
-
-            option.value = contest.name;
-
-            option.textContent = contest.name;
-
-            contestSelect.appendChild(option);
-
-        });
-
-
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
         alert(
-            "Connection error while loading contests."
+            "Connection error."
         );
 
     }
@@ -189,26 +440,28 @@ async function loadContests() {
    LOAD CONTESTANTS
 ========================= */
 
-async function loadContestants() {
+async function loadContestants(){
 
-    try {
+    try{
 
-        const response = await fetch(
-            SUPABASE_URL +
-            "/rest/v1/contestants?select=id,name,contest,photo&order=id.asc",
-            {
-                method: "GET",
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/contestants?select=id,name,contest,photo&order=id.asc",
+                {
+                    headers:{
+                        "apikey":
+                            SUPABASE_KEY,
 
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization":
-                        "Bearer " + SUPABASE_KEY
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
                 }
-            }
-        );
+            );
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             const error =
                 await response.text();
@@ -226,12 +479,12 @@ async function loadContestants() {
         return await response.json();
 
 
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
         alert(
-            "Connection error while loading contestants."
+            "Connection error."
         );
 
         return [];
@@ -242,89 +495,10 @@ async function loadContestants() {
 
 
 /* =========================
-   GET VOTE COUNTS
+   SHOW CONTESTANTS
 ========================= */
 
-async function getVoteCounts() {
-
-    try {
-
-        const response = await fetch(
-            SUPABASE_URL +
-            "/rest/v1/votes?select=contestant_id",
-            {
-                method: "GET",
-
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization":
-                        "Bearer " + SUPABASE_KEY
-                }
-            }
-        );
-
-
-        if (!response.ok) {
-
-            const error =
-                await response.text();
-
-            alert(
-                "Could not load votes: " +
-                error
-            );
-
-            return {};
-
-        }
-
-
-        const votes =
-            await response.json();
-
-
-        const counts = {};
-
-
-        votes.forEach(function(vote) {
-
-            const id =
-                String(vote.contestant_id);
-
-            if (!counts[id]) {
-
-                counts[id] = 0;
-
-            }
-
-            counts[id]++;
-
-        });
-
-
-        return counts;
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Connection error while loading votes."
-        );
-
-        return {};
-
-    }
-
-}
-
-
-/* =========================
-   DISPLAY CONTESTANTS
-========================= */
-
-async function showContestants() {
+async function showContestants(){
 
     const selectedContest =
         contestSelect.value;
@@ -333,7 +507,11 @@ async function showContestants() {
     contestantsList.innerHTML = "";
 
 
-    if (!selectedContest) {
+    votingPanel.style.display =
+        "none";
+
+
+    if(!selectedContest){
 
         contestantsList.innerHTML =
             "<p>Please select a contest.</p>";
@@ -351,22 +529,21 @@ async function showContestants() {
         await loadContestants();
 
 
-    const voteCounts =
-        await getVoteCounts();
-
-
-    const filtered =
-        contestants.filter(function(contestant) {
-
-            return contestant.contest === selectedContest;
-
-        });
-
-
     contestantsList.innerHTML = "";
 
 
-    if (filtered.length === 0) {
+    const filtered =
+        contestants.filter(
+            function(contestant){
+
+                return contestant.contest ===
+                    selectedContest;
+
+            }
+        );
+
+
+    if(filtered.length === 0){
 
         contestantsList.innerHTML =
             "<p>No contestants registered for this contest.</p>";
@@ -376,163 +553,226 @@ async function showContestants() {
     }
 
 
-    filtered.forEach(function(contestant) {
+    filtered.forEach(
+        function(contestant){
 
-        const voteCount =
-            voteCounts[String(contestant.id)] || 0;
-
-
-        const div =
-            document.createElement("div");
-
-
-        div.className = "contestant";
-
-
-        div.innerHTML = `
-
-            ${
-                contestant.photo
-                ? `<img src="${contestant.photo}" alt="Contestant Photo">`
-                : ""
-            }
-
-            <h2>${contestant.name}</h2>
-
-            <p>
-                Votes:
-                <strong>${voteCount}</strong>
-            </p>
-
-            <button class="voteButton">
-                Vote
-            </button>
-
-        `;
-
-
-        const voteButton =
-            div.querySelector(".voteButton");
-
-
-        voteButton.addEventListener(
-            "click",
-            function() {
-
-                castVote(
-                    contestant.id,
-                    voteButton
+            const div =
+                document.createElement(
+                    "div"
                 );
 
-            }
-        );
+
+            div.className =
+                "contestant";
 
 
-        contestantsList.appendChild(div);
+            div.innerHTML = `
 
+                ${
+                    contestant.photo
+                    ?
+                    `<img
+                        src="${contestant.photo}"
+                        alt="Contestant Photo"
+                    >`
+                    :
+                    ""
+                }
+
+                <h2>
+                    ${contestant.name}
+                </h2>
+
+                <button
+                    class="voteButton">
+
+                    Vote Now
+
+                </button>
+
+            `;
+
+
+            const voteButton =
+                div.querySelector(
+                    ".voteButton"
+                );
+
+
+            voteButton.addEventListener(
+                "click",
+                function(){
+
+                    openVotingPanel(
+                        contestant
+                    );
+
+                }
+            );
+
+
+            contestantsList.appendChild(
+                div
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================
+   OPEN VOTING PANEL
+========================= */
+
+function openVotingPanel(
+    contestant
+){
+
+    currentContestant =
+        contestant;
+
+
+    selectedContestant.innerHTML = `
+
+        ${
+            contestant.photo
+            ?
+            `<img
+                src="${contestant.photo}"
+                alt="Contestant Photo"
+            >`
+            :
+            ""
+        }
+
+        <h3>
+            Voting for:
+            ${contestant.name}
+        </h3>
+
+    `;
+
+
+    voterContact.value = "";
+
+    voteAmount.value = "";
+
+    totalAmount.textContent =
+        "Total: ₦0";
+
+
+    votingPanel.style.display =
+        "block";
+
+
+    votingPanel.scrollIntoView({
+        behavior:"smooth"
     });
 
 }
 
 
 /* =========================
-   CAST VOTE
+   CALCULATE AMOUNT
 ========================= */
 
-async function castVote(
-    contestantId,
-    voteButton
-) {
+voteAmount.addEventListener(
+    "change",
+    function(){
 
-    voteButton.disabled = true;
-
-    voteButton.textContent =
-        "Submitting...";
-
-
-    try {
-
-        const response = await fetch(
-            SUPABASE_URL +
-            "/rest/v1/votes",
-            {
-
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json",
-
-                    "apikey":
-                        SUPABASE_KEY,
-
-                    "Authorization":
-                        "Bearer " +
-                        SUPABASE_KEY,
-
-                    "Prefer":
-                        "return=minimal"
-
-                },
-
-                body:
-                    JSON.stringify({
-
-                        contestant_id:
-                            contestantId
-
-                    })
-
-            }
-        );
-
-
-        if (!response.ok) {
-
-            const error =
-                await response.text();
-
-            alert(
-                "Vote failed: " +
-                error
+        const votes =
+            Number(
+                voteAmount.value
             );
 
-            voteButton.disabled = false;
 
-            voteButton.textContent =
-                "Vote";
+        const amount =
+            votes * 100;
+
+
+        totalAmount.textContent =
+            "Total: ₦" +
+            amount.toLocaleString();
+
+    }
+);
+
+
+/* =========================
+   PAYMENT BUTTON
+========================= */
+
+payButton.addEventListener(
+    "click",
+    function(){
+
+        const contact =
+            voterContact.value.trim();
+
+
+        const votes =
+            Number(
+                voteAmount.value
+            );
+
+
+        if(!contact){
+
+            alert(
+                "Please enter your phone number or email."
+            );
 
             return;
 
         }
 
 
+        if(!votes){
+
+            alert(
+                "Please select the number of votes."
+            );
+
+            return;
+
+        }
+
+
+        const amount =
+            votes * 100;
+
+
         alert(
-            "Vote recorded successfully!"
+            "Payment setup is being connected.\n\n" +
+            "Contestant: " +
+            currentContestant.name +
+            "\nVotes: " +
+            votes +
+            "\nAmount: ₦" +
+            amount.toLocaleString()
         );
-
-
-        showContestants();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Connection error while voting."
-        );
-
-
-        voteButton.disabled = false;
-
-        voteButton.textContent =
-            "Vote";
 
     }
+);
 
-}
+
+/* =========================
+   CANCEL
+========================= */
+
+cancelButton.addEventListener(
+    "click",
+    function(){
+
+        votingPanel.style.display =
+            "none";
+
+        currentContestant =
+            null;
+
+    }
+);
 
 
 /* =========================
@@ -546,7 +786,7 @@ contestSelect.addEventListener(
 
 
 /* =========================
-   START PAGE
+   START
 ========================= */
 
 loadContests();
