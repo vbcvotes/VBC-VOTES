@@ -699,16 +699,16 @@ voteAmount.addEventListener(
     }
 );
 
-
 /* =========================
-   PAYSTACK TEST PAYMENT
+   PAYSTACK PAYMENT
 ========================= */
 
-const PAYSTACK_PUBLIC_KEY = "pk_test_98ab5dcc9b2d1de67bbf41edf4ad4177d1f81c75";
+const SUPABASE_FUNCTION_URL =
+    "https://dwedhbcsgfdqvurgnuvf.supabase.co/functions/v1/smart-responder";
 
 payButton.addEventListener(
     "click",
-    function(){
+    async function(){
 
         const contact =
             voterContact.value.trim();
@@ -743,76 +743,106 @@ payButton.addEventListener(
             return;
         }
 
-        const amount = votes * 100;
+        const amount =
+            votes * 100;
 
-        const reference =
-            "VBC-" +
-            Date.now() +
-            "-" +
-            Math.random()
-                .toString(36)
-                .substring(2,8)
-                .toUpperCase();
+        const email =
+            contact.includes("@")
+            ? contact
+            : "voter" +
+              Date.now() +
+              "@vbcvotes.com";
 
-        const paystack =
-            new PaystackPop();
+        payButton.disabled = true;
 
-        paystack.newTransaction({
+        payButton.textContent =
+            "Connecting to Paystack...";
 
-            key: PAYSTACK_PUBLIC_KEY,
+        try{
 
-            email:
-                contact.includes("@")
-                ? contact
-                : "voter" +
-                  Date.now() +
-                  "@vbcvotes.com",
+            const response =
+                await fetch(
+                    SUPABASE_FUNCTION_URL,
+                    {
+                        method:"POST",
 
-            amount: amount * 100,
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
 
-            currency: "NGN",
+                        body:JSON.stringify({
 
-            reference: reference,
+                            email:email,
 
-            metadata: {
+                            amount:amount,
 
-                contestant_id:
-                    currentContestant.id,
+                            contestantId:
+                                currentContestant.id,
 
-                contestant_name:
-                    currentContestant.name,
+                            contestantName:
+                                currentContestant.name,
 
-                votes: votes,
+                            votes:votes,
 
-                voter_contact:
-                    contact
+                            contest:
+                                contestSelect.value
 
-            },
-
-            onSuccess: function(transaction){
-
-                alert(
-                    "Payment successful!\n\n" +
-                    "Reference: " +
-                    transaction.reference +
-                    "\n\n" +
-                    "Your payment has been received."
+                        })
+                    }
                 );
 
-                votingPanel.style.display =
-                    "none";
 
-            },
+            const result =
+                await response.json();
 
-            onCancel: function(){
 
-                alert(
-                    "Payment was cancelled."
+            if(!response.ok){
+
+                throw new Error(
+                    result.error ||
+                    "Payment initialization failed."
                 );
 
             }
 
-        });
+
+            if(
+                result.status &&
+                result.data &&
+                result.data.authorization_url
+            ){
+
+                window.location.href =
+                    result.data.authorization_url;
+
+                return;
+
+            }
+
+
+            throw new Error(
+                "Paystack did not return a payment link."
+            );
+
+
+        }catch(error){
+
+            console.error(error);
+
+            alert(
+                "Unable to start payment.\n\n" +
+                error.message
+            );
+
+        }finally{
+
+            payButton.disabled = false;
+
+            payButton.textContent =
+                "Proceed to Payment";
+
+        }
 
     }
 );
