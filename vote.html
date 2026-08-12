@@ -160,6 +160,7 @@ input, select{
 }
 
 </style>
+<script src="https://js.paystack.co/v2/inline.js"></script>
 </head>
 
 
@@ -700,8 +701,10 @@ voteAmount.addEventListener(
 
 
 /* =========================
-   PAYMENT BUTTON
+   PAYSTACK TEST PAYMENT
 ========================= */
+
+const PAYSTACK_PUBLIC_KEY = "pk_test_98ab5dcc9b2d1de67bbf41edf4ad4177d1f81c75";
 
 payButton.addEventListener(
     "click",
@@ -710,12 +713,8 @@ payButton.addEventListener(
         const contact =
             voterContact.value.trim();
 
-
         const votes =
-            Number(
-                voteAmount.value
-            );
-
+            Number(voteAmount.value);
 
         if(!contact){
 
@@ -724,9 +723,7 @@ payButton.addEventListener(
             );
 
             return;
-
         }
-
 
         if(!votes){
 
@@ -735,23 +732,87 @@ payButton.addEventListener(
             );
 
             return;
-
         }
 
+        if(!currentContestant){
 
-        const amount =
-            votes * 100;
+            alert(
+                "Please select a contestant."
+            );
 
+            return;
+        }
 
-        alert(
-            "Payment setup is being connected.\n\n" +
-            "Contestant: " +
-            currentContestant.name +
-            "\nVotes: " +
-            votes +
-            "\nAmount: ₦" +
-            amount.toLocaleString()
-        );
+        const amount = votes * 100;
+
+        const reference =
+            "VBC-" +
+            Date.now() +
+            "-" +
+            Math.random()
+                .toString(36)
+                .substring(2,8)
+                .toUpperCase();
+
+        const paystack =
+            new PaystackPop();
+
+        paystack.newTransaction({
+
+            key: PAYSTACK_PUBLIC_KEY,
+
+            email:
+                contact.includes("@")
+                ? contact
+                : "voter" +
+                  Date.now() +
+                  "@vbcvotes.com",
+
+            amount: amount * 100,
+
+            currency: "NGN",
+
+            reference: reference,
+
+            metadata: {
+
+                contestant_id:
+                    currentContestant.id,
+
+                contestant_name:
+                    currentContestant.name,
+
+                votes: votes,
+
+                voter_contact:
+                    contact
+
+            },
+
+            onSuccess: function(transaction){
+
+                alert(
+                    "Payment successful!\n\n" +
+                    "Reference: " +
+                    transaction.reference +
+                    "\n\n" +
+                    "Your payment has been received."
+                );
+
+                votingPanel.style.display =
+                    "none";
+
+            },
+
+            onCancel: function(){
+
+                alert(
+                    "Payment was cancelled."
+                );
+
+            }
+
+        });
 
     }
 );
