@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
@@ -59,47 +60,69 @@ h1{
 
 .votes{
     text-align:center;
-    font-size:20px;
+    font-size:22px;
     font-weight:bold;
+    color:#16a34a;
 }
 
 .rank{
     text-align:center;
-    font-size:18px;
+    font-size:20px;
     font-weight:bold;
+    margin-bottom:10px;
 }
 
 .back{
     display:block;
+    width:100%;
+    padding:12px;
+    background:#0066ff;
+    color:white;
+    border-radius:6px;
     text-align:center;
-    margin-top:20px;
-    color:#003399;
-    font-weight:bold;
     text-decoration:none;
+    box-sizing:border-box;
+    margin-top:20px;
 }
 
 </style>
 
 </head>
 
+
 <body>
 
 <div class="container">
 
-<h1>VBC Votes Results</h1>
+<h1>
+VBC Votes Results
+</h1>
+
 
 <select id="contestSelect">
 
-<option value="">
-Select Contest
-</option>
+    <option value="">
+        Select Contest
+    </option>
 
 </select>
 
-<div id="resultsList"></div>
 
-<a class="back" href="dashboard.html">
-← Back to Dashboard
+<div id="resultsList">
+
+    <p>
+        Please select a contest.
+    </p>
+
+</div>
+
+
+<a
+    class="back"
+    href="dashboard.html">
+
+    ← Back to Dashboard
+
 </a>
 
 </div>
@@ -107,131 +130,321 @@ Select Contest
 
 <script>
 
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+    "https://dwedhbcsgfdqvurgnuvf.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
 const contestSelect =
-document.getElementById("contestSelect");
+    document.getElementById(
+        "contestSelect"
+    );
 
 const resultsList =
-document.getElementById("resultsList");
+    document.getElementById(
+        "resultsList"
+    );
 
 
-let contests =
-JSON.parse(localStorage.getItem("contests")) || [];
+/* =========================
+   LOAD CONTESTS
+========================= */
+
+async function loadContests(){
+
+    try{
+
+        const response =
+            await fetch(
+
+                SUPABASE_URL +
+                "/rest/v1/contests?select=id,name&order=id.asc",
+
+                {
+                    headers:{
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
+                }
+
+            );
 
 
-let contestants =
-JSON.parse(localStorage.getItem("contestants")) || [];
+        if(!response.ok){
+
+            const error =
+                await response.text();
+
+            console.error(error);
+
+            resultsList.innerHTML =
+                "<p>Could not load contests.</p>";
+
+            return;
+
+        }
 
 
-/* Load contests */
-
-contests.forEach(function(contest){
-
-const option =
-document.createElement("option");
-
-option.value =
-contest.name;
-
-option.textContent =
-contest.name;
-
-contestSelect.appendChild(option);
-
-});
+        const contests =
+            await response.json();
 
 
-/* Display results */
+        contests.forEach(
+            function(contest){
 
-function showResults(){
-
-const selectedContest =
-contestSelect.value;
-
-resultsList.innerHTML = "";
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
 
-if(!selectedContest){
+                /*
+                Use the contest ID,
+                not the contest name.
+                */
 
-resultsList.innerHTML =
-"<p>Please select a contest.</p>";
+                option.value =
+                    contest.id;
 
-return;
+
+                option.textContent =
+                    contest.name;
+
+
+                contestSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        resultsList.innerHTML =
+            "<p>Connection error.</p>";
+
+    }
+
+}
+
+
+/* =========================
+   LOAD RESULTS
+========================= */
+
+async function showResults(){
+
+    const contestId =
+        contestSelect.value;
+
+
+    resultsList.innerHTML =
+        "";
+
+
+    if(!contestId){
+
+        resultsList.innerHTML =
+            "<p>Please select a contest.</p>";
+
+        return;
+
+    }
+
+
+    resultsList.innerHTML =
+        "<p>Loading live results...</p>";
+
+
+    try{
+
+        const response =
+            await fetch(
+
+                SUPABASE_URL +
+
+                "/rest/v1/contestants" +
+
+                "?select=id,name,photo,votes,contest" +
+
+                "&contest_id=eq." +
+
+                encodeURIComponent(
+                    contestId
+                ) +
+
+                "&order=votes.desc,id.asc",
+
+                {
+                    headers:{
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+
+                    }
+
+                }
+
+            );
+
+
+        if(!response.ok){
+
+            const error =
+                await response.text();
+
+            console.error(error);
+
+            resultsList.innerHTML =
+                "<p>Could not load results.</p>";
+
+            return;
+
+        }
+
+
+        const contestants =
+            await response.json();
+
+
+        resultsList.innerHTML =
+            "";
+
+
+        if(
+            contestants.length === 0
+        ){
+
+            resultsList.innerHTML =
+                "<p>No contestants found for this contest.</p>";
+
+            return;
+
+        }
+
+
+        contestants.forEach(
+            function(
+                contestant,
+                index
+            ){
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "result";
+
+
+                const votes =
+                    Number(
+                        contestant.votes || 0
+                    );
+
+
+                div.innerHTML = `
+
+                    <div class="rank">
+
+                        Rank ${index + 1}
+
+                    </div>
+
+
+                    ${
+                        contestant.photo
+
+                        ?
+
+                        `<img
+                            src="${contestant.photo}"
+                            alt="Contestant Photo"
+                        >`
+
+                        :
+
+                        ""
+                    }
+
+
+                    <h2>
+
+                        ${contestant.name}
+
+                    </h2>
+
+
+                    <div class="votes">
+
+                        Votes: ${votes.toLocaleString()}
+
+                    </div>
+
+                `;
+
+
+                resultsList.appendChild(
+                    div
+                );
+
+            }
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        resultsList.innerHTML =
+            "<p>Connection error.</p>";
+
+    }
 
 }
 
 
-let filtered =
-contestants.filter(function(contestant){
-
-return contestant.contest === selectedContest;
-
-});
-
-
-if(filtered.length === 0){
-
-resultsList.innerHTML =
-"<p>No contestants found for this contest.</p>";
-
-return;
-
-}
-
-
-/* Sort highest votes first */
-
-filtered.sort(function(a,b){
-
-return Number(b.votes || 0) -
-       Number(a.votes || 0);
-
-});
-
-
-filtered.forEach(function(contestant,index){
-
-const div =
-document.createElement("div");
-
-div.className =
-"result";
-
-
-div.innerHTML = `
-
-<div class="rank">
-Rank ${index + 1}
-</div>
-
-${
-contestant.photo
-? `<img src="${contestant.photo}" alt="Contestant Photo">`
-: ""
-}
-
-<h2>
-${contestant.name}
-</h2>
-
-<div class="votes">
-Votes: ${Number(contestant.votes || 0)}
-</div>
-
-`;
-
-resultsList.appendChild(div);
-
-});
-
-}
-
+/* =========================
+   CONTEST CHANGE
+========================= */
 
 contestSelect.addEventListener(
-"change",
-showResults
+    "change",
+    showResults
 );
+
+
+/* =========================
+   START
+========================= */
+
+loadContests();
 
 </script>
 
 </body>
+
 </html>
