@@ -10,7 +10,7 @@
 <style>
 
 body{
-    font-family: Arial, sans-serif;
+    font-family:Arial,sans-serif;
     background:#eef3ff;
     margin:0;
     padding:20px;
@@ -24,6 +24,15 @@ body{
 h1{
     text-align:center;
     color:#003399;
+}
+
+#contestSelect{
+    width:100%;
+    padding:12px;
+    margin-bottom:20px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box;
 }
 
 .contestant{
@@ -45,6 +54,11 @@ h1{
 
 .contestant h3{
     color:#003399;
+    text-align:center;
+}
+
+.contestant p{
+    line-height:1.5;
 }
 
 .back{
@@ -59,6 +73,7 @@ h1{
     text-align:center;
     text-decoration:none;
     box-sizing:border-box;
+    margin-top:20px;
 }
 
 </style>
@@ -71,7 +86,19 @@ h1{
 
 <h1>Registered Contestants</h1>
 
-<div id="contestantList"></div>
+<select id="contestSelect">
+
+    <option value="">
+        Select Contest
+    </option>
+
+</select>
+
+<div id="contestantList">
+
+    <p>Please select a contest.</p>
+
+</div>
 
 <a class="back" href="dashboard.html">
     ← Back to Dashboard
@@ -79,68 +106,280 @@ h1{
 
 </div>
 
+
 <script>
 
-let contestants =
-    JSON.parse(localStorage.getItem("contestants")) || [];
+/* =========================
+   SUPABASE
+========================= */
 
-let list =
-    document.getElementById("contestantList");
+const SUPABASE_URL =
+    "https://dwedhbcsgfdqvurgnuvf.supabase.co";
 
-if (contestants.length === 0) {
+const SUPABASE_KEY =
+    "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
 
-    list.innerHTML =
-        "<p>No contestants have been registered yet.</p>";
 
-} else {
+/* =========================
+   ELEMENTS
+========================= */
 
-    contestants.forEach(function(contestant) {
+const contestSelect =
+    document.getElementById(
+        "contestSelect"
+    );
 
-        list.innerHTML += `
+const contestantList =
+    document.getElementById(
+        "contestantList"
+    );
 
-            <div class="contestant">
 
-                ${
-                    contestant.photo
-                    ? `<img src="${contestant.photo}" alt="Contestant Photo">`
-                    : ""
+/* =========================
+   LOAD CONTESTS
+========================= */
+
+async function loadContests(){
+
+    try{
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/contests?select=id,name&order=id.asc",
+                {
+                    headers:{
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
                 }
+            );
 
-                <h3>${contestant.name}</h3>
 
-                <p>
-                    <strong>Contest:</strong>
-                    ${contestant.contest}
-                </p>
+        if(!response.ok){
 
-                <p>
-                    <strong>Email:</strong>
-                    ${contestant.email}
-                </p>
+            const error =
+                await response.text();
 
-                <p>
-                    <strong>Phone:</strong>
-                    ${contestant.phone}
-                </p>
+            contestantList.innerHTML =
+                "<p>Could not load contests.</p>";
 
-                <hr>
+            console.error(error);
 
-            </div>
+            return;
 
-        `;
+        }
 
-    });
+
+        const contests =
+            await response.json();
+
+
+        contests.forEach(
+            function(contest){
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    contest.name;
+
+                option.textContent =
+                    contest.name;
+
+                contestSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        contestantList.innerHTML =
+            "<p>Connection error.</p>";
+
+    }
 
 }
+
+
+/* =========================
+   LOAD CONTESTANTS
+========================= */
+
+async function loadContestants(){
+
+    contestantList.innerHTML =
+        "<p>Loading contestants...</p>";
+
+
+    const selectedContest =
+        contestSelect.value;
+
+
+    if(!selectedContest){
+
+        contestantList.innerHTML =
+            "<p>Please select a contest.</p>";
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/contestants?select=id,name,phone,email,contest,photo,votes&contest=eq." +
+                encodeURIComponent(selectedContest) +
+                "&order=id.asc",
+                {
+                    headers:{
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
+                }
+            );
+
+
+        if(!response.ok){
+
+            const error =
+                await response.text();
+
+            console.error(error);
+
+            contestantList.innerHTML =
+                "<p>Could not load contestants.</p>";
+
+            return;
+
+        }
+
+
+        const contestants =
+            await response.json();
+
+
+        contestantList.innerHTML = "";
+
+
+        if(contestants.length === 0){
+
+            contestantList.innerHTML =
+                "<p>No contestants have been registered for this contest yet.</p>";
+
+            return;
+
+        }
+
+
+        contestants.forEach(
+            function(contestant){
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "contestant";
+
+
+                div.innerHTML = `
+
+                    ${
+                        contestant.photo
+                        ?
+                        `<img
+                            src="${contestant.photo}"
+                            alt="Contestant Photo"
+                        >`
+                        :
+                        ""
+                    }
+
+                    <h3>
+                        ${contestant.name}
+                    </h3>
+
+                    <p>
+                        <strong>Contest:</strong>
+                        ${contestant.contest}
+                    </p>
+
+                    <p>
+                        <strong>Email:</strong>
+                        ${contestant.email || "Not provided"}
+                    </p>
+
+                    <p>
+                        <strong>Phone:</strong>
+                        ${contestant.phone || "Not provided"}
+                    </p>
+
+                    <p>
+                        <strong>Votes:</strong>
+                        ${contestant.votes || 0}
+                    </p>
+
+                `;
+
+
+                contestantList.appendChild(
+                    div
+                );
+
+            }
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        contestantList.innerHTML =
+            "<p>Connection error.</p>";
+
+    }
+
+}
+
+
+/* =========================
+   CONTEST CHANGE
+========================= */
+
+contestSelect.addEventListener(
+    "change",
+    loadContestants
+);
+
+
+/* =========================
+   START
+========================= */
+
+loadContests();
 
 </script>
 
 </body>
 </html>
-                                                                                      
-                                                                                                          
-                                                                                                                 
-                                                                                                                                    
-                                                                                                                                     
-                                                                                                                            
-                                                                        
