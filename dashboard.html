@@ -1,119 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>VBC Votes - Dashboard</title>
 
 <style>
+
+*{
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
 body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#f4f8fc;
+    margin:0;
+    background:#f4f8fc;
+    color:#333;
 }
 
 header{
-background:#0057B8;
-color:white;
-padding:20px;
-text-align:center;
+    background:#0057B8;
+    color:white;
+    padding:25px 20px;
+    text-align:center;
+}
+
+header h1{
+    margin:0 0 10px;
+}
+
+header p{
+    margin:0;
 }
 
 .container{
-padding:20px;
+    max-width:700px;
+    margin:auto;
+    padding:20px;
 }
 
 .card{
-background:white;
-padding:20px;
-margin-bottom:20px;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,.1);
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,.1);
 }
 
 .card h2{
-color:#0057B8;
-margin-top:0;
+    color:#0057B8;
+    margin-top:0;
 }
 
-.button{
-display:inline-block;
-padding:12px 20px;
-background:#16a34a;
-color:white;
-text-decoration:none;
-border-radius:8px;
-margin-top:10px;
+.card p{
+    line-height:1.5;
 }
+
+.action-button{
+    display:block;
+    width:100%;
+    padding:13px;
+    margin-top:10px;
+    background:#16a34a;
+    color:white;
+    text-decoration:none;
+    text-align:center;
+    border-radius:8px;
+    border:none;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.action-button:hover{
+    background:#12843a;
+}
+
+.blue-button{
+    background:#0066ff;
+}
+
+.blue-button:hover{
+    background:#0052cc;
+}
+
+.red-button{
+    background:#dc2626;
+}
+
+.red-button:hover{
+    background:#b91c1c;
+}
+
 </style>
 
 </head>
 
+
 <body>
+
+
 <header>
 
-<h1>Welcome to VBC Votes Dashboard</h1>
+<h1>
+Welcome to VBC Votes Dashboard
+</h1>
 
-<p>Manage your contests, contestants, votes, and payments from one place.</p>
-
-<h2>Quick Actions</h2>
-
-<button onclick="window.location.href='contestant.html'">
-    Register Contestant
-</button>
-
-<button onclick="window.location.href='contestants.html'">
-    View Contestants
-</button>
-
-<button onclick="window.location.href='vote.html'">
-    VOTE NOW
-</button>
-
-<button onclick="window.location.href='contest.html'">
-    Create Contest
-</button>
-
-<button onclick="window.location.href='index.html'">
-    Logout
-</button>
+<p>
+Manage your contests, contestants, votes, and payments from one place.
+</p>
 
 </header>
 
-    
-        
-            
-            
-               
 
 <div class="container">
 
-<div class="card">
-<h2>Create New Election</h2>
-<p>Create and manage online voting events.</p>
-<a href="#" class="button">Create Election</a>
-</div>
+
+<!-- CREATE CONTEST -->
 
 <div class="card">
-<h2>Manage Contestants</h2>
-<a href="contestant.html" class="action-button">
+
+<h2>
+Create New Contest
+</h2>
+
+<p>
+Create and manage your online voting contests.
+</p>
+
+<a
+    href="contest.html"
+    class="action-button">
+
+    Create Contest
+
+</a>
+
+</div>
+
+
+<!-- CONTESTANTS -->
+
+<div class="card">
+
+<h2>
+Manage Contestants
+</h2>
+
+<p>
+Register contestants or view contestants already registered.
+</p>
+
+<a
+    href="contestant.html"
+    class="action-button">
+
     Register Contestant
+
 </a>
 
-<a href="contestants.html" class="action-button">
+<a
+    href="contestants.html"
+    class="action-button blue-button">
+
     View All Contestants
+
 </a>
-<p>Add, edit or remove contestants.</p>
-<a href="#" class="button">Manage Contestants</a>
+
 </div>
+
+
+<!-- VOTING -->
 
 <div class="card">
-<h2>View Results</h2>
-<p>Monitor live voting results.</p>
-<a href="results.html" class="button">View Results</a>
+
+<h2>
+Voting
+
+</h2>
+
+<p>
+Open the public voting page and test the voting process.
+</p>
+
+<a
+    href="vote.html"
+    class="action-button">
+
+    VOTE NOW
+
+</a>
+
 </div>
+
+
+<!-- RESULTS -->
+
+<div class="card">
+
+<h2>
+View Results
+</h2>
+
+<p>
+Monitor contestant votes and live voting results.
+</p>
+
+<a
+    href="results.html"
+    class="action-button blue-button">
+
+    View Results
+
+</a>
+
+</div>
+
+
+<!-- LOGOUT -->
+
+<div class="card">
+
+<a
+    href="index.html"
+    class="action-button red-button">
+
+    Logout
+
+</a>
+
+</div>
+
 
 </div>
 
 </body>
+
 </html>
