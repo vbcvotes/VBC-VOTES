@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,6 +49,10 @@ button{
     cursor:pointer;
 }
 
+button:disabled{
+    background:#999;
+}
+
 a{
     display:block;
     margin-top:20px;
@@ -56,47 +61,64 @@ a{
     font-weight:bold;
     text-decoration:none;
 }
+
+#loading{
+    text-align:center;
+    padding:40px;
+    font-size:18px;
+}
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div id="loading">
+    Checking admin access...
+</div>
+
+
+<div class="container" id="contestPage" style="display:none;">
 
 <h1>Create New Contest</h1>
 
 <form id="contestForm">
 
 <input
-type="text"
-id="contestName"
-placeholder="Contest Name"
-required>
+    type="text"
+    id="contestName"
+    placeholder="Contest Name"
+    required
+>
 
 <input
-type="text"
-id="organizer"
-placeholder="Organizer Name"
-required>
+    type="text"
+    id="organizer"
+    placeholder="Organizer Name"
+    required
+>
 
 <input
-type="date"
-id="startDate"
-required>
+    type="date"
+    id="startDate"
+    required
+>
 
 <input
-type="date"
-id="endDate"
-required>
+    type="date"
+    id="endDate"
+    required
+>
 
 <textarea
-id="description"
-placeholder="Contest Description"
-rows="5"
-required></textarea>
+    id="description"
+    placeholder="Contest Description"
+    rows="5"
+    required
+></textarea>
 
-<button type="submit">
-Create Contest
+<button type="submit" id="createButton">
+    Create Contest
 </button>
 
 </form>
@@ -106,6 +128,8 @@ Create Contest
 </a>
 
 </div>
+
+
 <script>
 
 const SUPABASE_URL =
@@ -115,92 +139,236 @@ const SUPABASE_KEY =
     "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
 
 
-const form =
-    document.getElementById("contestForm");
+/* =========================
+   CHECK ADMIN LOGIN
+========================= */
 
+async function checkAdmin(){
 
-form.addEventListener("submit", async function(e) {
-
-    e.preventDefault();
-
-    const contest = {
-
-        name:
-            document.getElementById("contestName")
-            .value.trim(),
-
-        organizer:
-            document.getElementById("organizer")
-            .value.trim(),
-
-        start_date:
-            document.getElementById("startDate")
-            .value,
-
-        end_date:
-            document.getElementById("endDate")
-            .value,
-
-        description:
-            document.getElementById("description")
-            .value.trim()
-
-    };
-
-
-    try {
-
-        const response = await fetch(
-            SUPABASE_URL + "/rest/v1/contests",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json",
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": "Bearer " + SUPABASE_KEY,
-                    "Prefer": "return=minimal"
-                },
-
-                body: JSON.stringify(contest)
-            }
+    const token =
+        localStorage.getItem(
+            "vbc_access_token"
         );
 
 
-        if (!response.ok) {
+    if(!token){
 
-            const error =
-                await response.text();
+        window.location.href =
+            "login.html";
 
-            alert(
-                "Supabase Error: " + error
+        return;
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/auth/v1/user",
+                {
+                    method:"GET",
+
+                    headers:{
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " + token
+                    }
+                }
             );
 
-            console.error(error);
+
+        if(!response.ok){
+
+            localStorage.removeItem(
+                "vbc_access_token"
+            );
+
+            localStorage.removeItem(
+                "vbc_refresh_token"
+            );
+
+            localStorage.removeItem(
+                "vbc_user_email"
+            );
+
+            window.location.href =
+                "login.html";
 
             return;
         }
 
 
-        alert(
-            "Contest Created Successfully!"
-        );
+        document.getElementById(
+            "loading"
+        ).style.display =
+            "none";
 
-        form.reset();
+
+        document.getElementById(
+            "contestPage"
+        ).style.display =
+            "block";
 
 
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
-        alert(
-            "Connection error. Please try again."
-        );
+        window.location.href =
+            "login.html";
 
     }
 
-});
+}
+
+
+/* =========================
+   CREATE CONTEST
+========================= */
+
+const form =
+    document.getElementById(
+        "contestForm"
+    );
+
+
+form.addEventListener(
+    "submit",
+    async function(e){
+
+        e.preventDefault();
+
+
+        const contest = {
+
+            name:
+                document.getElementById(
+                    "contestName"
+                ).value.trim(),
+
+            organizer:
+                document.getElementById(
+                    "organizer"
+                ).value.trim(),
+
+            start_date:
+                document.getElementById(
+                    "startDate"
+                ).value,
+
+            end_date:
+                document.getElementById(
+                    "endDate"
+                ).value,
+
+            description:
+                document.getElementById(
+                    "description"
+                ).value.trim()
+
+        };
+
+
+        const createButton =
+            document.getElementById(
+                "createButton"
+            );
+
+
+        createButton.disabled = true;
+
+        createButton.textContent =
+            "Creating Contest...";
+
+
+        try{
+
+            const response =
+                await fetch(
+                    SUPABASE_URL +
+                    "/rest/v1/contests",
+                    {
+                        method:"POST",
+
+                        headers:{
+                            "Content-Type":
+                                "application/json",
+
+                            "apikey":
+                                SUPABASE_KEY,
+
+                            "Authorization":
+                                "Bearer " +
+                                SUPABASE_KEY,
+
+                            "Prefer":
+                                "return=minimal"
+                        },
+
+                        body:
+                            JSON.stringify(
+                                contest
+                            )
+                    }
+                );
+
+
+            if(!response.ok){
+
+                const error =
+                    await response.text();
+
+                alert(
+                    "Supabase Error: " +
+                    error
+                );
+
+                console.error(error);
+
+                return;
+            }
+
+
+            alert(
+                "Contest Created Successfully!"
+            );
+
+
+            form.reset();
+
+
+        }catch(error){
+
+            console.error(error);
+
+            alert(
+                "Connection error. Please try again."
+            );
+
+        }finally{
+
+            createButton.disabled = false;
+
+            createButton.textContent =
+                "Create Contest";
+
+        }
+
+    }
+);
+
+
+/* =========================
+   START
+========================= */
+
+checkAdmin();
 
 </script>
+
 </body>
+
 </html>
