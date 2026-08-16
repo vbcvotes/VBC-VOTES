@@ -85,6 +85,16 @@ h1{
     margin-top:20px;
 }
 
+#checking{
+    text-align:center;
+    padding:40px;
+    font-size:18px;
+}
+
+#resultsPage{
+    display:none;
+}
+
 </style>
 
 </head>
@@ -92,7 +102,18 @@ h1{
 
 <body>
 
-<div class="container">
+
+<div id="checking">
+
+    Checking admin access...
+
+</div>
+
+
+<div
+    class="container"
+    id="resultsPage"
+>
 
 <h1>
 VBC Votes Results
@@ -130,6 +151,7 @@ VBC Votes Results
 
 <script>
 
+
 /* =========================
    SUPABASE
 ========================= */
@@ -139,6 +161,105 @@ const SUPABASE_URL =
 
 const SUPABASE_KEY =
     "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
+
+
+/* =========================
+   ADMIN AUTHENTICATION
+========================= */
+
+async function checkAdmin(){
+
+    const token =
+        localStorage.getItem(
+            "vbc_access_token"
+        );
+
+
+    if(!token){
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+
+                SUPABASE_URL +
+                "/auth/v1/user",
+
+                {
+
+                    method:"GET",
+
+                    headers:{
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            token
+
+                    }
+
+                }
+
+            );
+
+
+        if(!response.ok){
+
+            localStorage.removeItem(
+                "vbc_access_token"
+            );
+
+            localStorage.removeItem(
+                "vbc_refresh_token"
+            );
+
+            localStorage.removeItem(
+                "vbc_user_email"
+            );
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "checking"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "resultsPage"
+        ).style.display =
+            "block";
+
+
+        loadContests();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        window.location.href =
+            "login.html";
+
+    }
+
+}
 
 
 /* =========================
@@ -171,14 +292,18 @@ async function loadContests(){
                 "/rest/v1/contests?select=id,name&order=id.asc",
 
                 {
+
                     headers:{
+
                         "apikey":
                             SUPABASE_KEY,
 
                         "Authorization":
                             "Bearer " +
                             SUPABASE_KEY
+
                     }
+
                 }
 
             );
@@ -203,6 +328,10 @@ async function loadContests(){
             await response.json();
 
 
+        contestSelect.innerHTML =
+            '<option value="">Select Contest</option>';
+
+
         contests.forEach(
             function(contest){
 
@@ -211,11 +340,6 @@ async function loadContests(){
                         "option"
                     );
 
-
-                /*
-                Use the contest ID,
-                not the contest name.
-                */
 
                 option.value =
                     contest.id;
@@ -279,7 +403,6 @@ async function showResults(){
             await fetch(
 
                 SUPABASE_URL +
-
                 "/rest/v1/contestants" +
 
                 "?select=id,name,photo,votes,contest" +
@@ -293,6 +416,7 @@ async function showResults(){
                 "&order=votes.desc,id.asc",
 
                 {
+
                     headers:{
 
                         "apikey":
@@ -441,7 +565,7 @@ contestSelect.addEventListener(
    START
 ========================= */
 
-loadContests();
+checkAdmin();
 
 </script>
 
