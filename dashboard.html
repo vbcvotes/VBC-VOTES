@@ -94,12 +94,40 @@ header p{
     background:#b91c1c;
 }
 
+#checking{
+    text-align:center;
+    padding:50px 20px;
+    font-size:18px;
+}
+
+#dashboard{
+    display:none;
+}
+
 </style>
 
 </head>
 
 
 <body>
+
+
+<!-- =========================
+     AUTH CHECK
+========================= -->
+
+<div id="checking">
+
+    Checking admin access...
+
+</div>
+
+
+<!-- =========================
+     DASHBOARD
+========================= -->
+
+<div id="dashboard">
 
 
 <header>
@@ -178,7 +206,6 @@ Register contestants or view contestants already registered.
 
 <h2>
 Voting
-
 </h2>
 
 <p>
@@ -223,18 +250,217 @@ Monitor contestant votes and live voting results.
 
 <div class="card">
 
-<a
-    href="index.html"
+<button
+    onclick="logout()"
     class="action-button red-button">
 
     Logout
 
-</a>
+</button>
 
 </div>
 
 
 </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+    "https://dwedhbcsgfdqvurgnuvf.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
+
+
+/* =========================
+   CHECK ADMIN LOGIN
+========================= */
+
+async function checkAdmin(){
+
+    const token =
+        localStorage.getItem(
+            "vbc_access_token"
+        );
+
+
+    /* No login token */
+
+    if(!token){
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+
+                SUPABASE_URL +
+                "/auth/v1/user",
+
+                {
+
+                    method:"GET",
+
+                    headers:{
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            token
+
+                    }
+
+                }
+
+            );
+
+
+        /* Token is invalid */
+
+        if(!response.ok){
+
+            clearLogin();
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+
+        /* Login is valid */
+
+        document.getElementById(
+            "checking"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "dashboard"
+        ).style.display =
+            "block";
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "Unable to verify admin login."
+        );
+
+        window.location.href =
+            "login.html";
+
+    }
+
+}
+
+
+/* =========================
+   CLEAR LOGIN
+========================= */
+
+function clearLogin(){
+
+    localStorage.removeItem(
+        "vbc_access_token"
+    );
+
+    localStorage.removeItem(
+        "vbc_refresh_token"
+    );
+
+    localStorage.removeItem(
+        "vbc_user_email"
+    );
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+    const token =
+        localStorage.getItem(
+            "vbc_access_token"
+        );
+
+
+    try{
+
+        if(token){
+
+            await fetch(
+
+                SUPABASE_URL +
+                "/auth/v1/logout",
+
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            token
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+
+    clearLogin();
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+checkAdmin();
+
+</script>
 
 </body>
 
