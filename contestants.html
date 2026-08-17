@@ -102,7 +102,9 @@ h1{
 
 
 <div id="loading">
+
 Checking admin access...
+
 </div>
 
 
@@ -112,16 +114,9 @@ Checking admin access...
     style="display:none;"
 >
 
-
 <h1>
 Registered Contestants
 </h1>
-
-
-<div
-    class="organization"
-    id="organizationDisplay">
-</div>
 
 
 <select id="contestSelect">
@@ -166,26 +161,6 @@ const SUPABASE_KEY =
 
 
 /* =========================
-   ELEMENTS
-========================= */
-
-const contestSelect =
-    document.getElementById(
-        "contestSelect"
-    );
-
-const contestantList =
-    document.getElementById(
-        "contestantList"
-    );
-
-const organizationDisplay =
-    document.getElementById(
-        "organizationDisplay"
-    );
-
-
-/* =========================
    ADMIN AUTHENTICATION
 ========================= */
 
@@ -196,13 +171,8 @@ async function checkAdmin(){
             "vbc_access_token"
         );
 
-    const organization =
-        localStorage.getItem(
-            "vbc_organization_name"
-        );
 
-
-    if(!token || !organization){
+    if(!token){
 
         window.location.href =
             "login.html";
@@ -254,21 +224,12 @@ async function checkAdmin(){
                 "vbc_user_email"
             );
 
-            localStorage.removeItem(
-                "vbc_organization_name"
-            );
-
             window.location.href =
                 "login.html";
 
             return;
 
         }
-
-
-        organizationDisplay.textContent =
-            "Organization: " +
-            organization;
 
 
         document.getElementById(
@@ -299,16 +260,25 @@ async function checkAdmin(){
 
 
 /* =========================
-   LOAD ORGANIZATION CONTESTS
+   ELEMENTS
+========================= */
+
+const contestSelect =
+    document.getElementById(
+        "contestSelect"
+    );
+
+const contestantList =
+    document.getElementById(
+        "contestantList"
+    );
+
+
+/* =========================
+   LOAD CONTESTS
 ========================= */
 
 async function loadContests(){
-
-    const organization =
-        localStorage.getItem(
-            "vbc_organization_name"
-        );
-
 
     try{
 
@@ -316,18 +286,7 @@ async function loadContests(){
             await fetch(
 
                 SUPABASE_URL +
-
-                "/rest/v1/contests" +
-
-                "?select=id,name,organization_name" +
-
-                "&organization_name=eq." +
-
-                encodeURIComponent(
-                    organization
-                ) +
-
-                "&order=id.asc",
+                "/rest/v1/contests?select=id,name,organization_name&order=id.asc",
 
                 {
 
@@ -384,10 +343,14 @@ async function loadContests(){
 
 
                 option.textContent =
-                    contest.name;
-
-
-                option.dataset.name =
+                    (
+                        contest.organization_name
+                        ?
+                        contest.organization_name +
+                        " — "
+                        :
+                        ""
+                    ) +
                     contest.name;
 
 
@@ -397,14 +360,6 @@ async function loadContests(){
 
             }
         );
-
-
-        if(contests.length === 0){
-
-            contestantList.innerHTML =
-                "<p>No contests have been created for this organization yet.</p>";
-
-        }
 
 
     }catch(error){
@@ -428,11 +383,6 @@ async function loadContestants(){
     const selectedContestId =
         contestSelect.value;
 
-    const organization =
-        localStorage.getItem(
-            "vbc_organization_name"
-        );
-
 
     if(!selectedContestId){
 
@@ -454,21 +404,13 @@ async function loadContestants(){
             await fetch(
 
                 SUPABASE_URL +
-
                 "/rest/v1/contestants" +
 
-                "?select=id,name,phone,email,contest_id,contest,photo,votes,organization_name" +
+                "?select=id,name,phone,email,contest_id,contest,photo,votes" +
 
                 "&contest_id=eq." +
-
                 encodeURIComponent(
                     selectedContestId
-                ) +
-
-                "&organization_name=eq." +
-
-                encodeURIComponent(
-                    organization
                 ) +
 
                 "&order=id.asc",
@@ -524,15 +466,17 @@ async function loadContestants(){
         }
 
 
+        /* Find selected contest */
+
         const selectedOption =
             contestSelect.options[
                 contestSelect.selectedIndex
             ];
 
 
-        const selectedContestName =
+        const selectedContestText =
             selectedOption
-            ? selectedOption.dataset.name
+            ? selectedOption.textContent
             : "";
 
 
@@ -553,12 +497,7 @@ async function loadContestants(){
 
                     <div class="organization">
 
-                        🏢 ${organization}
-
-                        <br>
-
-                        Contest:
-                        ${selectedContestName}
+                        🏢 ${selectedContestText}
 
                     </div>
 
