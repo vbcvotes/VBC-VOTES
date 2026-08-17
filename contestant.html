@@ -31,6 +31,16 @@ h1{
     color:#003399;
 }
 
+.organization{
+    text-align:center;
+    background:#eef6ff;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:15px;
+    color:#0057B8;
+    font-weight:bold;
+}
+
 input,
 select{
     width:100%;
@@ -84,9 +94,7 @@ a{
 
 
 <div id="loading">
-
 Checking admin access...
-
 </div>
 
 
@@ -96,9 +104,16 @@ Checking admin access...
     style="display:none;"
 >
 
+
 <h1>
 Register Contestant
 </h1>
+
+
+<div
+    class="organization"
+    id="organizationDisplay">
+</div>
 
 
 <form id="contestantForm">
@@ -162,10 +177,9 @@ Register Contestant
 
 
 <a href="dashboard.html">
-
 ← Back to Dashboard
-
 </a>
+
 
 </div>
 
@@ -188,6 +202,23 @@ const BUCKET =
 
 
 /* =========================
+   ELEMENTS
+========================= */
+
+const contestSelect =
+    document.getElementById("contest");
+
+const form =
+    document.getElementById("contestantForm");
+
+const registerButton =
+    document.getElementById("registerButton");
+
+const organizationDisplay =
+    document.getElementById("organizationDisplay");
+
+
+/* =========================
    ADMIN AUTHENTICATION
 ========================= */
 
@@ -198,8 +229,13 @@ async function checkAdmin(){
             "vbc_access_token"
         );
 
+    const organization =
+        localStorage.getItem(
+            "vbc_organization_name"
+        );
 
-    if(!token){
+
+    if(!token || !organization){
 
         window.location.href =
             "login.html";
@@ -251,12 +287,21 @@ async function checkAdmin(){
                 "vbc_user_email"
             );
 
+            localStorage.removeItem(
+                "vbc_organization_name"
+            );
+
             window.location.href =
                 "login.html";
 
             return;
 
         }
+
+
+        organizationDisplay.textContent =
+            "Organization: " +
+            organization;
 
 
         document.getElementById(
@@ -287,30 +332,16 @@ async function checkAdmin(){
 
 
 /* =========================
-   ELEMENTS
-========================= */
-
-const contestSelect =
-    document.getElementById(
-        "contest"
-    );
-
-const form =
-    document.getElementById(
-        "contestantForm"
-    );
-
-const registerButton =
-    document.getElementById(
-        "registerButton"
-    );
-
-
-/* =========================
-   LOAD CONTESTS
+   LOAD ORGANIZATION CONTESTS
 ========================= */
 
 async function loadContests(){
+
+    const organization =
+        localStorage.getItem(
+            "vbc_organization_name"
+        );
+
 
     try{
 
@@ -318,7 +349,18 @@ async function loadContests(){
             await fetch(
 
                 SUPABASE_URL +
-                "/rest/v1/contests?select=id,name&order=id.asc",
+
+                "/rest/v1/contests" +
+
+                "?select=id,name" +
+
+                "&organization_name=eq." +
+
+                encodeURIComponent(
+                    organization
+                ) +
+
+                "&order=id.asc",
 
                 {
 
@@ -392,6 +434,14 @@ async function loadContests(){
         );
 
 
+        if(contests.length === 0){
+
+            contestSelect.innerHTML =
+                '<option value="">No contests found</option>';
+
+        }
+
+
     }catch(error){
 
         console.error(error);
@@ -414,6 +464,12 @@ form.addEventListener(
     async function(event){
 
         event.preventDefault();
+
+
+        const organization =
+            localStorage.getItem(
+                "vbc_organization_name"
+            );
 
 
         const name =
@@ -461,6 +517,7 @@ form.addEventListener(
 
 
         if(
+            !organization ||
             !name ||
             !phone ||
             !email ||
@@ -488,7 +545,9 @@ form.addEventListener(
         try{
 
 
-            /* CREATE PHOTO NAME */
+            /* =========================
+               CREATE PHOTO NAME
+            ========================= */
 
             const fileExtension =
                 photo.name
@@ -507,7 +566,9 @@ form.addEventListener(
                 fileExtension;
 
 
-            /* UPLOAD PHOTO */
+            /* =========================
+               UPLOAD PHOTO
+            ========================= */
 
             const uploadResponse =
                 await fetch(
@@ -561,7 +622,9 @@ form.addEventListener(
             }
 
 
-            /* PHOTO URL */
+            /* =========================
+               PHOTO URL
+            ========================= */
 
             const photoUrl =
                 SUPABASE_URL +
@@ -571,7 +634,9 @@ form.addEventListener(
                 fileName;
 
 
-            /* CONTESTANT DATA */
+            /* =========================
+               CONTESTANT DATA
+            ========================= */
 
             const contestant = {
 
@@ -585,6 +650,9 @@ form.addEventListener(
 
                 contest_id:contestId,
 
+                organization_name:
+                    organization,
+
                 photo:photoUrl,
 
                 votes:0
@@ -592,7 +660,9 @@ form.addEventListener(
             };
 
 
-            /* SAVE CONTESTANT */
+            /* =========================
+               SAVE CONTESTANT
+            ========================= */
 
             const saveResponse =
                 await fetch(
@@ -685,6 +755,7 @@ form.addEventListener(
 checkAdmin();
 
 </script>
+
 
 </body>
 
