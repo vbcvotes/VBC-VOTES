@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Admin Login | VBC Votes</title>
 
 <style>
+
 body{
     font-family:Arial,sans-serif;
     background:#f4f8fc;
@@ -51,6 +54,7 @@ button{
     border:none;
     border-radius:8px;
     font-size:16px;
+    cursor:pointer;
 }
 
 button:disabled{
@@ -68,17 +72,34 @@ button:disabled{
     text-align:center;
     margin-top:15px;
 }
+
 </style>
 
 </head>
 
+
 <body>
+
 
 <div class="container">
 
-<h1>VBC Votes</h1>
 
-<p>Admin / Organization Login</p>
+<h1>
+VBC Votes
+</h1>
+
+
+<p>
+Admin / Organization Login
+</p>
+
+
+<input
+    type="text"
+    id="organizationName"
+    placeholder="Organization Name"
+>
+
 
 <input
     type="email"
@@ -86,22 +107,33 @@ button:disabled{
     placeholder="Email Address"
 >
 
+
 <input
     type="password"
     id="password"
     placeholder="Password"
 >
 
+
 <button id="loginButton">
-    Login
+Login
 </button>
 
+
 <div id="errorMessage"></div>
+
 <div id="successMessage"></div>
+
 
 </div>
 
+
 <script>
+
+
+/* =========================
+   SUPABASE
+========================= */
 
 const SUPABASE_URL =
     "https://dwedhbcsgfdqvurgnuvf.supabase.co";
@@ -110,47 +142,91 @@ const SUPABASE_KEY =
     "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
 
 
+/* =========================
+   ELEMENTS
+========================= */
+
+const organizationInput =
+    document.getElementById(
+        "organizationName"
+    );
+
 const emailInput =
-    document.getElementById("email");
+    document.getElementById(
+        "email"
+    );
 
 const passwordInput =
-    document.getElementById("password");
+    document.getElementById(
+        "password"
+    );
 
 const loginButton =
-    document.getElementById("loginButton");
+    document.getElementById(
+        "loginButton"
+    );
 
 const errorMessage =
-    document.getElementById("errorMessage");
+    document.getElementById(
+        "errorMessage"
+    );
 
 const successMessage =
-    document.getElementById("successMessage");
+    document.getElementById(
+        "successMessage"
+    );
 
+
+/* =========================
+   LOGIN
+========================= */
 
 loginButton.addEventListener(
     "click",
     async function(){
 
+        const organization =
+            organizationInput
+            .value
+            .trim();
+
         const email =
-            emailInput.value.trim();
+            emailInput
+            .value
+            .trim();
 
         const password =
-            passwordInput.value;
+            passwordInput
+            .value;
 
 
-        errorMessage.textContent = "";
-        successMessage.textContent = "";
+        errorMessage.textContent =
+            "";
+
+        successMessage.textContent =
+            "";
 
 
-        if(!email || !password){
+        /* =========================
+           VALIDATION
+        ========================= */
+
+        if(
+            !organization ||
+            !email ||
+            !password
+        ){
 
             errorMessage.textContent =
-                "Please enter your email and password.";
+                "Please enter your organization name, email and password.";
 
             return;
+
         }
 
 
-        loginButton.disabled = true;
+        loginButton.disabled =
+            true;
 
         loginButton.textContent =
             "Checking login...";
@@ -158,29 +234,43 @@ loginButton.addEventListener(
 
         try{
 
+
+            /* =========================
+               SUPABASE LOGIN
+            ========================= */
+
             const response =
                 await fetch(
+
                     SUPABASE_URL +
                     "/auth/v1/token?grant_type=password",
+
                     {
+
                         method:"POST",
 
                         headers:{
+
                             "Content-Type":
                                 "application/json",
 
                             "apikey":
                                 SUPABASE_KEY
+
                         },
 
                         body:JSON.stringify({
 
-                            email:email,
+                            email:
+                                email,
 
-                            password:password
+                            password:
+                                password
 
                         })
+
                     }
+
                 );
 
 
@@ -194,6 +284,10 @@ loginButton.addEventListener(
             );
 
 
+            /* =========================
+               LOGIN ERROR
+            ========================= */
+
             if(!response.ok){
 
                 errorMessage.textContent =
@@ -202,14 +296,20 @@ loginButton.addEventListener(
                     result.message ||
                     "Invalid email or password.";
 
-                loginButton.disabled = false;
+                loginButton.disabled =
+                    false;
 
                 loginButton.textContent =
                     "Login";
 
                 return;
+
             }
 
+
+            /* =========================
+               SAVE LOGIN INFORMATION
+            ========================= */
 
             if(result.access_token){
 
@@ -231,23 +331,38 @@ loginButton.addEventListener(
                 );
 
 
+                /* =========================
+                   SAVE ORGANIZATION
+                ========================= */
+
+                localStorage.setItem(
+                    "vbc_organization_name",
+                    organization
+                );
+
+
                 successMessage.textContent =
                     "Login successful!";
 
 
-                setTimeout(function(){
+                setTimeout(
+                    function(){
 
-                    window.location.href =
-                        "dashboard.html";
+                        window.location.href =
+                            "dashboard.html";
 
-                },700);
+                    },
+                    700
+                );
+
 
             }else{
 
                 errorMessage.textContent =
                     "Login failed. No access token received.";
 
-                loginButton.disabled = false;
+                loginButton.disabled =
+                    false;
 
                 loginButton.textContent =
                     "Login";
@@ -259,11 +374,14 @@ loginButton.addEventListener(
 
             console.error(error);
 
+
             errorMessage.textContent =
                 "Connection error: " +
                 error.message;
 
-            loginButton.disabled = false;
+
+            loginButton.disabled =
+                false;
 
             loginButton.textContent =
                 "Login";
@@ -275,5 +393,7 @@ loginButton.addEventListener(
 
 </script>
 
+
 </body>
+
 </html>
