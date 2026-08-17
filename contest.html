@@ -31,6 +31,16 @@ h1{
     color:#003399;
 }
 
+.organization{
+    text-align:center;
+    background:#eef6ff;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:15px;
+    color:#0057B8;
+    font-weight:bold;
+}
+
 input,
 textarea{
     width:100%;
@@ -71,6 +81,12 @@ a{
     font-size:18px;
 }
 
+#errorMessage{
+    color:#d00000;
+    text-align:center;
+    margin-top:15px;
+}
+
 </style>
 
 </head>
@@ -80,9 +96,7 @@ a{
 
 
 <div id="loading">
-
     Checking admin access...
-
 </div>
 
 
@@ -92,20 +106,19 @@ a{
     style="display:none;"
 >
 
+
 <h1>
 Create New Contest
 </h1>
 
 
+<div
+    class="organization"
+    id="organizationDisplay">
+</div>
+
+
 <form id="contestForm">
-
-
-<input
-    type="text"
-    id="organizationName"
-    placeholder="Organization Name"
-    required
->
 
 
 <input
@@ -150,19 +163,18 @@ Create New Contest
     type="submit"
     id="createButton"
 >
-
     Create Contest
-
 </button>
 
 
 </form>
 
 
+<div id="errorMessage"></div>
+
+
 <a href="dashboard.html">
-
 ← Back to Dashboard
-
 </a>
 
 
@@ -184,7 +196,7 @@ const SUPABASE_KEY =
 
 
 /* =========================
-   CHECK ADMIN LOGIN
+   CHECK ADMIN
 ========================= */
 
 async function checkAdmin(){
@@ -195,7 +207,13 @@ async function checkAdmin(){
         );
 
 
-    if(!token){
+    const organization =
+        localStorage.getItem(
+            "vbc_organization_name"
+        );
+
+
+    if(!token || !organization){
 
         window.location.href =
             "login.html";
@@ -247,6 +265,10 @@ async function checkAdmin(){
                 "vbc_user_email"
             );
 
+            localStorage.removeItem(
+                "vbc_organization_name"
+            );
+
             window.location.href =
                 "login.html";
 
@@ -265,6 +287,13 @@ async function checkAdmin(){
             "contestPage"
         ).style.display =
             "block";
+
+
+        document.getElementById(
+            "organizationDisplay"
+        ).textContent =
+            "Organization: " +
+            organization;
 
 
     }catch(error){
@@ -296,54 +325,20 @@ form.addEventListener(
         e.preventDefault();
 
 
-        const organizationName =
-            document.getElementById(
-                "organizationName"
-            ).value.trim();
+        const organization =
+            localStorage.getItem(
+                "vbc_organization_name"
+            );
 
 
-        const contestName =
-            document.getElementById(
-                "contestName"
-            ).value.trim();
-
-
-        const organizer =
-            document.getElementById(
-                "organizer"
-            ).value.trim();
-
-
-        const startDate =
-            document.getElementById(
-                "startDate"
-            ).value;
-
-
-        const endDate =
-            document.getElementById(
-                "endDate"
-            ).value;
-
-
-        const description =
-            document.getElementById(
-                "description"
-            ).value.trim();
-
-
-        if(
-            !organizationName ||
-            !contestName ||
-            !organizer ||
-            !startDate ||
-            !endDate ||
-            !description
-        ){
+        if(!organization){
 
             alert(
-                "Please fill in all fields."
+                "Organization information is missing. Please login again."
             );
+
+            window.location.href =
+                "login.html";
 
             return;
 
@@ -352,23 +347,33 @@ form.addEventListener(
 
         const contest = {
 
-            organization_name:
-                organizationName,
-
             name:
-                contestName,
+                document.getElementById(
+                    "contestName"
+                ).value.trim(),
 
             organizer:
-                organizer,
+                document.getElementById(
+                    "organizer"
+                ).value.trim(),
 
             start_date:
-                startDate,
+                document.getElementById(
+                    "startDate"
+                ).value,
 
             end_date:
-                endDate,
+                document.getElementById(
+                    "endDate"
+                ).value,
 
             description:
-                description
+                document.getElementById(
+                    "description"
+                ).value.trim(),
+
+            organization_name:
+                organization
 
         };
 
@@ -377,6 +382,16 @@ form.addEventListener(
             document.getElementById(
                 "createButton"
             );
+
+
+        const errorMessage =
+            document.getElementById(
+                "errorMessage"
+            );
+
+
+        errorMessage.textContent =
+            "";
 
 
         createButton.disabled =
@@ -412,7 +427,7 @@ form.addEventListener(
                                 SUPABASE_KEY,
 
                             "Prefer":
-                                "return=representation"
+                                "return=minimal"
 
                         },
 
@@ -426,22 +441,18 @@ form.addEventListener(
                 );
 
 
-            const responseText =
-                await response.text();
-
-
-            console.log(
-                "Supabase response:",
-                responseText
-            );
-
-
             if(!response.ok){
 
-                alert(
-                    "Contest could not be created:\n\n" +
-                    responseText
-                );
+                const error =
+                    await response.text();
+
+
+                errorMessage.textContent =
+                    "Supabase Error: " +
+                    error;
+
+
+                console.error(error);
 
                 return;
 
@@ -460,10 +471,11 @@ form.addEventListener(
 
             console.error(error);
 
-            alert(
-                "Connection error:\n\n" +
-                error.message
-            );
+
+            errorMessage.textContent =
+                "Connection error: " +
+                error.message;
+
 
         }finally{
 
@@ -486,6 +498,7 @@ form.addEventListener(
 checkAdmin();
 
 </script>
+
 
 </body>
 
