@@ -355,16 +355,8 @@ async function loadContests(){
                     contest.id;
 
 
-                option.textContent =
-                    (
-                        contest.organization_name
-                        ?
-                        contest.organization_name +
-                        " — "
-                        :
-                        ""
-                    ) +
-                    contest.name;
+              option.textContent =
+    contest.name;
 
 
                 contestSelect.appendChild(
@@ -479,18 +471,8 @@ async function loadContestants(){
         }
 
 
-        /* Find selected contest */
-
-        const selectedOption =
-            contestSelect.options[
-                contestSelect.selectedIndex
-            ];
-
-
-        const selectedContestText =
-            selectedOption
-            ? selectedOption.textContent
-            : "";
+   
+      
 
 
         contestants.forEach(
@@ -506,13 +488,44 @@ async function loadContestants(){
                     "contestant";
 
 
-                div.innerHTML = `
+               div.innerHTML = `
 
-                    <div class="organization">
+    ${
+        contestant.photo
+        ?
+        `<img
+            src="${contestant.photo}"
+            alt="Contestant Photo"
+        >`
+        :
+        ""
+    }
 
-                        🏢 ${selectedContestText}
+    <h3>
+        ${contestant.name}
+    </h3>
 
-                    </div>
+    <p>
+        <strong>Contest:</strong>
+        ${contestant.contest || "Not provided"}
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        ${contestant.email || "Not provided"}
+    </p>
+
+    <p>
+        <strong>Phone:</strong>
+        ${contestant.phone || "Not provided"}
+    </p>
+
+    <p>
+        <strong>Votes:</strong>
+        ${contestant.votes || 0}
+    </p>
+
+`;
 
 
                     ${
