@@ -1,35 +1,26 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vote | VBC Votes</title>
 
 <style>
-
 body{
     font-family:Arial,sans-serif;
     background:#eef3ff;
     margin:0;
     padding:20px;
 }
-
 .container{
     max-width:700px;
     margin:auto;
 }
-
 h1{
     text-align:center;
     color:#003399;
 }
-
 #contestSelect{
     width:100%;
     padding:12px;
@@ -38,7 +29,16 @@ h1{
     border-radius:6px;
     box-sizing:border-box;
 }
-
+#paymentMessage{
+    display:none;
+    background:white;
+    padding:18px;
+    margin-bottom:20px;
+    border-radius:10px;
+    text-align:center;
+    overflow-wrap:anywhere;
+    box-shadow:0 0 8px rgba(0,0,0,.10);
+}
 #contestInfo{
     background:white;
     padding:15px;
@@ -48,16 +48,13 @@ h1{
     box-shadow:0 0 8px rgba(0,0,0,.10);
     display:none;
 }
-
 #contestInfo h3{
     margin:5px 0;
     color:#003399;
 }
-
 #contestInfo p{
     margin:5px 0;
 }
-
 .contestant{
     background:white;
     padding:20px;
@@ -66,18 +63,15 @@ h1{
     box-shadow:0 0 10px rgba(0,0,0,.15);
     text-align:center;
 }
-
 .contestant img{
     width:150px;
     height:150px;
     object-fit:cover;
     border-radius:8px;
 }
-
 .contestant h2{
     color:#003399;
 }
-
 .voteButton{
     width:100%;
     padding:13px;
@@ -88,11 +82,9 @@ h1{
     font-size:17px;
     cursor:pointer;
 }
-
 .voteButton:hover{
     background:#12843a;
 }
-
 .back{
     display:block;
     text-align:center;
@@ -101,12 +93,6 @@ h1{
     font-weight:bold;
     text-decoration:none;
 }
-
-
-/* =========================
-   VOTING FORM
-========================= */
-
 #votingPanel{
     display:none;
     background:white;
@@ -115,40 +101,33 @@ h1{
     border-radius:12px;
     box-shadow:0 0 10px rgba(0,0,0,.15);
 }
-
 #votingPanel h2{
     text-align:center;
     color:#003399;
 }
-
 .selectedContestant{
     text-align:center;
     margin-bottom:20px;
 }
-
 .selectedContestant img{
     width:120px;
     height:120px;
     object-fit:cover;
     border-radius:8px;
 }
-
 label{
     display:block;
     margin-top:15px;
     margin-bottom:6px;
     font-weight:bold;
 }
-
-input,
-select{
+input,select{
     width:100%;
     padding:12px;
     box-sizing:border-box;
     border:1px solid #ccc;
     border-radius:6px;
 }
-
 #totalAmount{
     margin-top:20px;
     padding:15px;
@@ -159,7 +138,6 @@ select{
     font-weight:bold;
     color:#003399;
 }
-
 .payButton{
     width:100%;
     padding:14px;
@@ -171,12 +149,10 @@ select{
     font-size:17px;
     cursor:pointer;
 }
-
 .payButton:disabled{
     background:#888;
     cursor:not-allowed;
 }
-
 .cancelButton{
     width:100%;
     padding:12px;
@@ -188,187 +164,76 @@ select{
     font-size:16px;
     cursor:pointer;
 }
-
 </style>
-
 </head>
 
-
 <body>
-
 <div class="container">
 
 <h1>VBC Votes</h1>
 
+<!-- PAYMENT VERIFICATION MESSAGE -->
+<div id="paymentMessage" role="status" aria-live="polite"></div>
 
-<!-- =========================
-     CONTEST SELECT
-========================= -->
-
+<!-- CONTEST SELECT -->
 <select id="contestSelect">
-
-    <option value="">
-        Select Contest
-    </option>
-
+    <option value="">Select Contest</option>
 </select>
 
-
-<!-- =========================
-     CONTEST INFORMATION
-========================= -->
-
+<!-- CONTEST INFORMATION -->
 <div id="contestInfo">
-
     <h3 id="contestName"></h3>
-
     <p id="organizationName"></p>
-
     <p id="votePrice"></p>
-
 </div>
 
-
-<!-- =========================
-     CONTESTANTS
-========================= -->
-
+<!-- CONTESTANTS -->
 <div id="contestantsList"></div>
 
-
-<!-- =========================
-     VOTING PANEL
-========================= -->
-
+<!-- VOTING PANEL -->
 <div id="votingPanel">
-
     <h2>Cast Your Vote</h2>
 
+    <div id="selectedContestant" class="selectedContestant"></div>
 
-    <div
-        id="selectedContestant"
-        class="selectedContestant">
-    </div>
+    <label for="voterName">Voter Name</label>
+    <input type="text" id="voterName" placeholder="Enter your name">
 
+    <label for="voterEmail">Email Address</label>
+    <input type="email" id="voterEmail" placeholder="Enter your email address">
 
-    <label for="voterName">
-        Voter Name
-    </label>
+    <label for="voterPhone">Phone Number</label>
+    <input type="tel" id="voterPhone" placeholder="Enter your phone number">
 
-    <input
-        type="text"
-        id="voterName"
-        placeholder="Enter your name"
-    >
-
-
-    <label for="voterEmail">
-        Email Address
-    </label>
-
-    <input
-        type="email"
-        id="voterEmail"
-        placeholder="Enter your email address"
-    >
-
-
-    <label for="voterPhone">
-        Phone Number
-    </label>
-
-    <input
-        type="tel"
-        id="voterPhone"
-        placeholder="Enter your phone number"
-    >
-
-
-    <label for="voteAmount">
-        Choose Number of Votes
-    </label>
-
+    <label for="voteAmount">Choose Number of Votes</label>
     <select id="voteAmount">
-
-        <option value="">
-            Select Number of Votes
-        </option>
-
-        <option value="1">
-            1 Vote
-        </option>
-
-        <option value="2">
-            2 Votes
-        </option>
-
-        <option value="3">
-            3 Votes
-        </option>
-
-        <option value="10">
-            10 Votes
-        </option>
-
-        <option value="50">
-            50 Votes
-        </option>
-
-        <option value="100">
-            100 Votes
-        </option>
-
-        <option value="500">
-            500 Votes
-        </option>
-
-        <option value="1000">
-            1,000 Votes
-        </option>
-
+        <option value="">Select Number of Votes</option>
+        <option value="1">1 Vote</option>
+        <option value="2">2 Votes</option>
+        <option value="3">3 Votes</option>
+        <option value="10">10 Votes</option>
+        <option value="50">50 Votes</option>
+        <option value="100">100 Votes</option>
+        <option value="500">500 Votes</option>
+        <option value="1000">1,000 Votes</option>
     </select>
 
+    <div id="totalAmount">Total: ₦0</div>
 
-    <div id="totalAmount">
-
-        Total: ₦0
-
-    </div>
-
-
-    <button
-        class="payButton"
-        id="payButton">
-
+    <button class="payButton" id="payButton">
         Proceed to Payment
-
     </button>
 
-
-    <button
-        class="cancelButton"
-        id="cancelButton">
-
+    <button class="cancelButton" id="cancelButton">
         Cancel
-
     </button>
-
 </div>
 
-
-<a
-    class="back"
-    href="index.html">
-
-    ← Back
-
-</a>
+<a class="back" href="index.html">← Back</a>
 
 </div>
-
 
 <script>
-
 
 /* =========================
    SUPABASE
@@ -380,85 +245,61 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_UP8hJISXy2-O_bpmmz3mow_ZqajzBeM";
 
+const FUNCTION_URL =
+    SUPABASE_URL + "/functions/v1/smart-responder";
+
 
 /* =========================
    ELEMENTS
 ========================= */
 
 const contestSelect =
-    document.getElementById(
-        "contestSelect"
-    );
+    document.getElementById("contestSelect");
 
 const contestInfo =
-    document.getElementById(
-        "contestInfo"
-    );
+    document.getElementById("contestInfo");
 
 const contestName =
-    document.getElementById(
-        "contestName"
-    );
+    document.getElementById("contestName");
 
 const organizationName =
-    document.getElementById(
-        "organizationName"
-    );
+    document.getElementById("organizationName");
 
 const votePrice =
-    document.getElementById(
-        "votePrice"
-    );
+    document.getElementById("votePrice");
 
 const contestantsList =
-    document.getElementById(
-        "contestantsList"
-    );
+    document.getElementById("contestantsList");
 
 const votingPanel =
-    document.getElementById(
-        "votingPanel"
-    );
+    document.getElementById("votingPanel");
 
 const selectedContestant =
-    document.getElementById(
-        "selectedContestant"
-    );
+    document.getElementById("selectedContestant");
 
 const voterName =
-    document.getElementById(
-        "voterName"
-    );
+    document.getElementById("voterName");
 
 const voterEmail =
-    document.getElementById(
-        "voterEmail"
-    );
+    document.getElementById("voterEmail");
 
 const voterPhone =
-    document.getElementById(
-        "voterPhone"
-    );
+    document.getElementById("voterPhone");
 
 const voteAmount =
-    document.getElementById(
-        "voteAmount"
-    );
+    document.getElementById("voteAmount");
 
 const totalAmount =
-    document.getElementById(
-        "totalAmount"
-    );
+    document.getElementById("totalAmount");
 
 const payButton =
-    document.getElementById(
-        "payButton"
-    );
+    document.getElementById("payButton");
 
 const cancelButton =
-    document.getElementById(
-        "cancelButton"
-    );
+    document.getElementById("cancelButton");
+
+const paymentMessage =
+    document.getElementById("paymentMessage");
 
 
 /* =========================
@@ -466,7 +307,6 @@ const cancelButton =
 ========================= */
 
 let currentContest = null;
-
 let currentContestant = null;
 
 
@@ -475,16 +315,163 @@ let currentContestant = null;
 ========================= */
 
 function supabaseHeaders(){
-
     return {
-
-        "apikey":
-            SUPABASE_KEY,
-
-        "Authorization":
-            "Bearer " + SUPABASE_KEY
-
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY
     };
+}
+
+
+/* =========================
+   PAYMENT MESSAGE
+========================= */
+
+function showPaymentMessage(message, color){
+
+    paymentMessage.textContent = message;
+    paymentMessage.style.display = "block";
+    paymentMessage.style.color = color || "#003399";
+
+    paymentMessage.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+    });
+}
+
+
+/* =========================
+   VERIFY RETURNED PAYMENT
+========================= */
+
+async function verifyPaymentReturn(){
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const reference = params.get("reference");
+
+    if(!reference){
+        return;
+    }
+
+    showPaymentMessage(
+        "Checking your payment. Please wait...",
+        "#003399"
+    );
+
+    try{
+
+        const response = await fetch(
+            FUNCTION_URL,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "apikey":SUPABASE_KEY
+                },
+                body:JSON.stringify({
+                    action:"verify_payment",
+                    reference:reference
+                })
+            }
+        );
+
+        let result;
+
+        try{
+            result = await response.json();
+        }catch{
+            throw new Error(
+                "The server returned an unreadable response."
+            );
+        }
+
+        console.log(
+            "Payment verification result:",
+            result
+        );
+
+        if(
+            result.status === true &&
+            result.payment_status === "success"
+        ){
+
+            if(result.duplicate === true){
+
+                showPaymentMessage(
+                    "This payment has already been recorded. No extra votes were added.",
+                    "#12843a"
+                );
+
+            }else if(result.credited === true){
+
+                showPaymentMessage(
+                    "Payment successful! Your votes have been recorded successfully.",
+                    "#12843a"
+                );
+
+            }else{
+
+                showPaymentMessage(
+                    "Payment was successful, but vote recording needs confirmation. Please contact support with reference: " + reference,
+                    "#b36b00"
+                );
+
+            }
+
+        }else if(
+            result.payment_status === "pending"
+        ){
+
+            showPaymentMessage(
+                "Your payment is still being processed. Please refresh this page shortly to check again.",
+                "#b36b00"
+            );
+
+        }else if(
+            result.payment_status === "failed" ||
+            result.payment_status === "abandoned" ||
+            result.payment_status === "reversed"
+        ){
+
+            showPaymentMessage(
+                "Payment was not completed successfully. No votes were added. You may try again.",
+                "#cc0000"
+            );
+
+        }else if(
+            result.payment_status === "review"
+        ){
+
+            showPaymentMessage(
+                "Your payment requires manual review. Please contact VBC Votes support and provide reference: " + reference,
+                "#b36b00"
+            );
+
+        }else{
+
+            showPaymentMessage(
+                result.error ||
+                "We could not confirm this payment. Please try again shortly. Reference: " + reference,
+                "#cc0000"
+            );
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "Payment verification error:",
+            error
+        );
+
+        showPaymentMessage(
+            "Unable to verify your payment right now. Please refresh this page to try again. Reference: " + reference,
+            "#cc0000"
+        );
+
+    }
 
 }
 
@@ -497,71 +484,38 @@ async function loadContests(){
 
     try{
 
-        const response =
-            await fetch(
-
-                SUPABASE_URL +
-                "/rest/v1/contests" +
-                "?select=id,name,organization_name,organization_id,vote_price" +
-                "&order=created_at.desc",
-
-                {
-                    headers:
-                        supabaseHeaders()
-                }
-
-            );
-
-
-        if(!response.ok){
-
-            const error =
-                await response.text();
-
-            console.error(error);
-
-            alert(
-                "Could not load contests."
-            );
-
-            return;
-
-        }
-
-
-        const contests =
-            await response.json();
-
-
-        contests.forEach(
-            function(contest){
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                /*
-                 * IMPORTANT:
-                 * VALUE IS NOW CONTEST ID
-                 */
-
-                option.value =
-                    contest.id;
-
-
-                option.textContent =
-                    contest.name;
-
-
-                contestSelect.appendChild(
-                    option
-                );
-
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/contests" +
+            "?select=id,name,organization_name,organization_id,vote_price" +
+            "&order=created_at.desc",
+            {
+                headers:supabaseHeaders()
             }
         );
 
+        if(!response.ok){
+
+            console.error(await response.text());
+
+            alert("Could not load contests.");
+
+            return;
+        }
+
+        const contests = await response.json();
+
+        contests.forEach(function(contest){
+
+            const option =
+                document.createElement("option");
+
+            option.value = contest.id;
+            option.textContent = contest.name;
+
+            contestSelect.appendChild(option);
+
+        });
 
     }catch(error){
 
@@ -580,48 +534,28 @@ async function loadContests(){
    LOAD SELECTED CONTEST
 ========================= */
 
-async function getSelectedContest(
-    contestId
-){
+async function getSelectedContest(contestId){
 
-    const response =
-        await fetch(
-
-            SUPABASE_URL +
-            "/rest/v1/contests" +
-            "?id=eq." +
-            encodeURIComponent(contestId) +
-            "&select=id,name,organization_name,organization_id,vote_price",
-
-            {
-                headers:
-                    supabaseHeaders()
-            }
-
-        );
-
+    const response = await fetch(
+        SUPABASE_URL +
+        "/rest/v1/contests" +
+        "?id=eq." +
+        encodeURIComponent(contestId) +
+        "&select=id,name,organization_name,organization_id,vote_price",
+        {
+            headers:supabaseHeaders()
+        }
+    );
 
     if(!response.ok){
-
-        throw new Error(
-            "Could not load contest."
-        );
-
+        throw new Error("Could not load contest.");
     }
 
-
-    const contests =
-        await response.json();
-
+    const contests = await response.json();
 
     if(!contests.length){
-
-        throw new Error(
-            "Contest not found."
-        );
-
+        throw new Error("Contest not found.");
     }
-
 
     return contests[0];
 
@@ -632,59 +566,40 @@ async function getSelectedContest(
    LOAD CONTESTANTS
 ========================= */
 
-async function loadContestants(
-    contestId
-){
+async function loadContestants(contestId){
 
     try{
 
-        const response =
-            await fetch(
-
-                SUPABASE_URL +
-                "/rest/v1/contestants" +
-                "?contest_id=eq." +
-                encodeURIComponent(contestId) +
-                "&select=id,name,contest_id,photo" +
-                "&order=created_at.asc",
-
-                {
-                    headers:
-                        supabaseHeaders()
-                }
-
-            );
-
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/contestants" +
+            "?contest_id=eq." +
+            encodeURIComponent(contestId) +
+            "&select=id,name,contest_id,photo" +
+            "&order=created_at.asc",
+            {
+                headers:supabaseHeaders()
+            }
+        );
 
         if(!response.ok){
 
-            const error =
-                await response.text();
+            console.error(await response.text());
 
-            console.error(error);
-
-            alert(
-                "Could not load contestants."
-            );
+            alert("Could not load contestants.");
 
             return [];
-
         }
 
-
         return await response.json();
-
 
     }catch(error){
 
         console.error(error);
 
-        alert(
-            "Connection error."
-        );
+        alert("Connection error.");
 
         return [];
-
     }
 
 }
@@ -696,179 +611,115 @@ async function loadContestants(
 
 async function showContestants(){
 
-    const contestId =
-        contestSelect.value;
+    const contestId = contestSelect.value;
 
+    contestantsList.innerHTML = "";
+    votingPanel.style.display = "none";
+    contestInfo.style.display = "none";
 
-    contestantsList.innerHTML =
-        "";
-
-    votingPanel.style.display =
-        "none";
-
-
-    contestInfo.style.display =
-        "none";
-
-
-    currentContest =
-        null;
-
-    currentContestant =
-        null;
-
+    currentContest = null;
+    currentContestant = null;
 
     if(!contestId){
 
-        contestantsList.innerHTML =
-            "<p>Please select a contest.</p>";
+        contestantsList.textContent =
+            "Please select a contest.";
 
         return;
-
     }
 
-
-    contestantsList.innerHTML =
-        "<p>Loading contest...</p>";
-
+    contestantsList.textContent =
+        "Loading contest...";
 
     try{
 
         currentContest =
-            await getSelectedContest(
-                contestId
-            );
-
-
-        /*
-         * DISPLAY CONTEST DETAILS
-         */
+            await getSelectedContest(contestId);
 
         contestName.textContent =
             currentContest.name;
 
-
         organizationName.textContent =
             "Organisation: " +
-            (
-                currentContest.organization_name
-                ||
-                "VBC Votes"
-            );
-
+            (currentContest.organization_name || "VBC Votes");
 
         const price =
-            Number(
-                currentContest.vote_price
-                || 100
-            );
-
+            Number(currentContest.vote_price || 100);
 
         votePrice.textContent =
             "Price per vote: ₦" +
             price.toLocaleString();
 
+        contestInfo.style.display = "block";
 
-        contestInfo.style.display =
-            "block";
-
-
-        contestantsList.innerHTML =
-            "<p>Loading contestants...</p>";
-
+        contestantsList.textContent =
+            "Loading contestants...";
 
         const contestants =
-            await loadContestants(
-                contestId
-            );
+            await loadContestants(contestId);
 
-
-        contestantsList.innerHTML =
-            "";
-
+        contestantsList.innerHTML = "";
 
         if(!contestants.length){
 
-            contestantsList.innerHTML =
-                "<p>No contestants registered for this contest.</p>";
+            contestantsList.textContent =
+                "No contestants registered for this contest.";
 
             return;
-
         }
 
+        contestants.forEach(function(contestant){
 
-        contestants.forEach(
-            function(contestant){
+            const div =
+                document.createElement("div");
 
-                const div =
-                    document.createElement(
-                        "div"
-                    );
+            div.className = "contestant";
 
+            if(contestant.photo){
 
-                div.className =
-                    "contestant";
+                const img =
+                    document.createElement("img");
 
+                img.src = contestant.photo;
+                img.alt = "Contestant Photo";
 
-                div.innerHTML = `
-
-                    ${
-                        contestant.photo
-                        ?
-                        `<img
-                            src="${contestant.photo}"
-                            alt="Contestant Photo"
-                        >`
-                        :
-                        ""
-                    }
-
-                    <h2>
-                        ${contestant.name}
-                    </h2>
-
-                    <button
-                        class="voteButton">
-
-                        Vote Now
-
-                    </button>
-
-                `;
-
-
-                const voteButton =
-                    div.querySelector(
-                        ".voteButton"
-                    );
-
-
-                voteButton.addEventListener(
-                    "click",
-                    function(){
-
-                        openVotingPanel(
-                            contestant
-                        );
-
-                    }
-                );
-
-
-                contestantsList.appendChild(
-                    div
-                );
+                div.appendChild(img);
 
             }
-        );
 
+            const heading =
+                document.createElement("h2");
+
+            heading.textContent =
+                contestant.name;
+
+            div.appendChild(heading);
+
+            const button =
+                document.createElement("button");
+
+            button.className = "voteButton";
+            button.textContent = "Vote Now";
+
+            button.addEventListener(
+                "click",
+                function(){
+                    openVotingPanel(contestant);
+                }
+            );
+
+            div.appendChild(button);
+
+            contestantsList.appendChild(div);
+
+        });
 
     }catch(error){
 
         console.error(error);
 
-        contestantsList.innerHTML =
-            "<p>Unable to load this contest.</p>";
+        contestantsList.textContent =
+            "Unable to load this contest.";
 
     }
 
@@ -879,54 +730,40 @@ async function showContestants(){
    OPEN VOTING PANEL
 ========================= */
 
-function openVotingPanel(
-    contestant
-){
+function openVotingPanel(contestant){
 
-    currentContestant =
-        contestant;
+    currentContestant = contestant;
 
+    selectedContestant.innerHTML = "";
 
-    selectedContestant.innerHTML = `
+    if(contestant.photo){
 
-        ${
-            contestant.photo
-            ?
-            `<img
-                src="${contestant.photo}"
-                alt="Contestant Photo"
-            >`
-            :
-            ""
-        }
+        const img =
+            document.createElement("img");
 
-        <h3>
-            Voting for:
-            ${contestant.name}
-        </h3>
+        img.src = contestant.photo;
+        img.alt = "Contestant Photo";
 
-    `;
+        selectedContestant.appendChild(img);
 
+    }
 
-    voterName.value =
-        "";
+    const heading =
+        document.createElement("h3");
 
-    voterEmail.value =
-        "";
+    heading.textContent =
+        "Voting for: " + contestant.name;
 
-    voterPhone.value =
-        "";
+    selectedContestant.appendChild(heading);
 
-    voteAmount.value =
-        "";
+    voterName.value = "";
+    voterEmail.value = "";
+    voterPhone.value = "";
+    voteAmount.value = "";
 
-    totalAmount.textContent =
-        "Total: ₦0";
+    totalAmount.textContent = "Total: ₦0";
 
-
-    votingPanel.style.display =
-        "block";
-
+    votingPanel.style.display = "block";
 
     votingPanel.scrollIntoView({
         behavior:"smooth"
@@ -943,26 +780,16 @@ voteAmount.addEventListener(
     "change",
     function(){
 
-        const votes =
-            Number(
-                voteAmount.value
-            );
+        const votes = Number(voteAmount.value);
 
+        const price = Number(
+            currentContest?.vote_price || 100
+        );
 
-        const price =
-            Number(
-                currentContest?.vote_price
-                || 100
-            );
-
-
-        const amount =
-            votes * price;
-
+        const amount = votes * price;
 
         totalAmount.textContent =
-            "Total: ₦" +
-            amount.toLocaleString();
+            "Total: ₦" + amount.toLocaleString();
 
     }
 );
@@ -976,209 +803,136 @@ payButton.addEventListener(
     "click",
     async function(){
 
-        const name =
-            voterName.value.trim();
-
-
-        const email =
-            voterEmail.value.trim();
-
-
-        const phone =
-            voterPhone.value.trim();
-
-
-        const votes =
-            Number(
-                voteAmount.value
-            );
-
+        const name = voterName.value.trim();
+        const email = voterEmail.value.trim();
+        const phone = voterPhone.value.trim();
+        const votes = Number(voteAmount.value);
 
         if(!currentContest){
 
-            alert(
-                "Please select a contest."
-            );
+            alert("Please select a contest.");
 
             return;
-
         }
-
 
         if(!currentContestant){
 
-            alert(
-                "Please select a contestant."
-            );
+            alert("Please select a contestant.");
 
             return;
-
         }
-
 
         if(!name){
 
-            alert(
-                "Please enter your name."
-            );
+            alert("Please enter your name.");
 
             voterName.focus();
 
             return;
-
         }
-
 
         if(!email){
 
-            alert(
-                "Please enter your email address."
-            );
+            alert("Please enter your email address.");
 
             voterEmail.focus();
 
             return;
-
         }
 
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
 
-        if(!email.includes("@")){
-
-            alert(
-                "Please enter a valid email address."
-            );
+            alert("Please enter a valid email address.");
 
             voterEmail.focus();
 
             return;
-
         }
 
+        if(!Number.isSafeInteger(votes) || votes < 1){
 
-        if(!votes){
-
-            alert(
-                "Please select the number of votes."
-            );
+            alert("Please select the number of votes.");
 
             return;
-
         }
 
-
-        payButton.disabled =
-            true;
+        payButton.disabled = true;
 
         payButton.textContent =
             "Connecting to Paystack...";
 
-
         try{
 
-            const response =
-                await fetch(
+            const response = await fetch(
+                FUNCTION_URL,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json",
+                        "apikey":SUPABASE_KEY
+                    },
+                    body:JSON.stringify({
 
-                    SUPABASE_URL +
-                    "/functions/v1/smart-responder",
+                        contestId:
+                            currentContest.id,
 
-                    {
+                        organizationId:
+                            currentContest.organization_id,
 
-                        method:"POST",
+                        contestantId:
+                            currentContestant.id,
 
-                        headers:{
+                        contestantName:
+                            currentContestant.name,
 
-                            "Content-Type":
-                                "application/json",
+                        votes:votes,
 
-                            "apikey":
-                                SUPABASE_KEY
+                        voterName:name,
 
-                        },
+                        voterEmail:email,
 
+                        voterPhone:phone
 
-                        body:
-                            JSON.stringify({
+                    })
+                }
+            );
 
-                                contestId:
-                                    currentContest.id,
-
-                                organizationId:
-                                    currentContest.organization_id,
-
-                                contestantId:
-                                    currentContestant.id,
-
-                                contestantName:
-                                    currentContestant.name,
-
-                                votes:
-                                    votes,
-
-                                voterName:
-                                    name,
-
-                                voterEmail:
-                                    email,
-
-                                voterPhone:
-                                    phone
-
-                            })
-
-                    }
-
-                );
-
-
-            const result =
-                await response.json();
-
+            const result = await response.json();
 
             console.log(
                 "Payment response:",
                 result
             );
 
+            const authorizationUrl =
+                result.data?.authorization_url ||
+                result.authorization_url;
 
-            if(
-
-                result.status &&
-                result.data &&
-                result.data.authorization_url
-
-            ){
+            if(result.status && authorizationUrl){
 
                 window.location.href =
-                    result.data.authorization_url;
+                    authorizationUrl;
 
                 return;
-
             }
 
-
             alert(
-
                 "Unable to start payment.\n\n" +
-                JSON.stringify(result)
-
+                (result.error || JSON.stringify(result))
             );
-
 
         }catch(error){
 
             console.error(error);
 
             alert(
-
                 "Payment connection failed.\n\n" +
                 error.message
-
             );
 
         }finally{
 
-            payButton.disabled =
-                false;
+            payButton.disabled = false;
 
             payButton.textContent =
                 "Proceed to Payment";
@@ -1197,11 +951,9 @@ cancelButton.addEventListener(
     "click",
     function(){
 
-        votingPanel.style.display =
-            "none";
+        votingPanel.style.display = "none";
 
-        currentContestant =
-            null;
+        currentContestant = null;
 
     }
 );
@@ -1209,21 +961,4 @@ cancelButton.addEventListener(
 
 /* =========================
    CONTEST CHANGE
-========================= */
-
-contestSelect.addEventListener(
-    "change",
-    showContestants
-);
-
-
-/* =========================
-   START
-========================= */
-
-loadContests();
-
-</script>
-
-</body>
-</html>
+=======================
