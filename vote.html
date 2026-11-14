@@ -962,3 +962,28 @@ cancelButton.addEventListener(
 /* =========================
    CONTEST CHANGE
 =======================
+
+*/
+
+/* =========================
+   CONTEST CHANGE
+========================= */
+
+contestSelect.addEventListener(
+    "change",
+    showContestants
+);
+
+/* =========================
+   START PAGE
+========================= */
+
+async function startPage(){
+
+    await verifyPaymentReturn();
+
+    await loadContests();
+
+}
+
+startPage();
