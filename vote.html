@@ -535,40 +535,7 @@ alert("Contest loader is running");
 
 }
 
-        if(!response.ok){
-
-            console.error(await response.text());
-
-            alert("Could not load contests.");
-
-            return;
-        }
-
-        const contests = await response.json();
-
-        contests.forEach(function(contest){
-
-            const option =
-                document.createElement("option");
-
-            option.value = contest.id;
-            option.textContent = contest.name;
-
-            contestSelect.appendChild(option);
-
-        });
-
-    }catch(error){
-
-        console.error(error);
-
-        alert(
-            "Connection error while loading contests."
-        );
-
-    }
-
-}
+  
 
 
 /* =========================
