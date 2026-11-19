@@ -479,22 +479,22 @@ async function verifyPaymentReturn(){
 /* =========================
    LOAD CONTESTS
 ========================= */
+
 async function loadContests(){
-alert("Contest loader is running");
+
     try{
 
-        const url =
-            SUPABASE_URL +
+        const url = SUPABASE_URL +
             "/rest/v1/contests" +
             "?select=id,name,organization_name,organization_id,vote_price" +
             "&order=created_at.desc";
 
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY,
-                "Accept": "application/json"
+        const response = await fetch(url,{
+            method:"GET",
+            headers:{
+                "apikey":SUPABASE_KEY,
+                "Authorization":"Bearer "+SUPABASE_KEY,
+                "Accept":"application/json"
             }
         });
 
@@ -502,9 +502,9 @@ alert("Contest loader is running");
 
             const errorText = await response.text();
 
-            console.error("Supabase error:", errorText);
+            console.error("Supabase error:",errorText);
 
-            alert("Could not load contests: " + errorText);
+            alert("Could not load contests: "+errorText);
 
             return;
         }
@@ -519,21 +519,29 @@ alert("Contest loader is running");
             const option = document.createElement("option");
 
             option.value = contest.id;
+
             option.textContent = contest.name;
 
             contestSelect.appendChild(option);
 
         });
 
+        if(contests.length === 0){
+
+            alert("Supabase connected, but no contests were returned.");
+
+        }
+
     }catch(error){
 
         console.error(error);
 
-        alert("Connection error while loading contests.");
+        alert("Connection error while loading contests: "+error.message);
 
     }
 
 }
+
 
   
 
